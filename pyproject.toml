@@ -45,6 +45,9 @@ image = [
 ]
 
 [dependency-groups]
+benchmark = [
+    "asv>=0.6.6",
+]
 dev = [
     "ruff",
     "mypy",

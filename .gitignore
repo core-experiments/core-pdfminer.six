@@ -27,6 +27,7 @@ Pipfile.lock
 poetry.lock
 .eggs
 .venv
+.asv/
 
 # Claude Code and Junie
 .claude/
