@@ -4,7 +4,7 @@ from io import BytesIO
 from typing import ClassVar
 
 from benchmarks.common import sample_path
-from pdfminer.high_level import extract_text_to_fp
+from core_pdfminer_six.high_level import extract_text_to_fp
 
 
 class OutputFormats:

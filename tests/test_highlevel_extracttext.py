@@ -1,7 +1,7 @@
 import unittest
 
-from pdfminer.high_level import extract_pages, extract_text
-from pdfminer.layout import LAParams, LTTextContainer
+from core_pdfminer_six.high_level import extract_pages, extract_text
+from core_pdfminer_six.layout import LAParams, LTTextContainer
 from tests.helpers import absolute_sample_path
 
 

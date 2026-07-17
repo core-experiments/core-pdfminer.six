@@ -7,16 +7,16 @@ from typing import (
     cast,
 )
 
-from pdfminer import utils
-from pdfminer.pdfcolor import PDFColorSpace
-from pdfminer.pdffont import PDFFont, PDFUnicodeNotDefined
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdftypes import PDFStream
-from pdfminer.psparser import PSLiteral
-from pdfminer.utils import Matrix, PathSegment, Point, Rect
+from core_pdfminer_six import utils
+from core_pdfminer_six.pdfcolor import PDFColorSpace
+from core_pdfminer_six.pdffont import PDFFont, PDFUnicodeNotDefined
+from core_pdfminer_six.pdfpage import PDFPage
+from core_pdfminer_six.pdftypes import PDFStream
+from core_pdfminer_six.psparser import PSLiteral
+from core_pdfminer_six.utils import Matrix, PathSegment, Point, Rect
 
 if TYPE_CHECKING:
-    from pdfminer.pdfinterp import (
+    from core_pdfminer_six.pdfinterp import (
         PDFGraphicState,
         PDFResourceManager,
         PDFStackT,

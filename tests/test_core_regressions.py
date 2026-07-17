@@ -3,10 +3,10 @@ from __future__ import annotations
 import sys
 from io import BytesIO
 
-from pdfminer.layout import LTComponent
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfparser import PDFParser
-from pdfminer.utils import Plane
+from core_pdfminer_six.layout import LTComponent
+from core_pdfminer_six.pdfdocument import PDFDocument
+from core_pdfminer_six.pdfparser import PDFParser
+from core_pdfminer_six.utils import Plane
 
 
 def make_pdf_with_xref_chain(length: int) -> bytes:

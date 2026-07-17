@@ -3,7 +3,7 @@ requires = ["setuptools >= 61.0", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pdfminer.six"
+name = "core-pdfminer.six"
 dynamic = ["version"]
 description = "PDF parser and analyzer"
 readme = "README.md"
@@ -65,14 +65,18 @@ fuzz = [
 
 
 [project.urls]
-Homepage = "https://github.com/pdfminer/pdfminer.six"
+Homepage = "https://github.com/core-experiments/core-pdfminer.six"
 
 [tool.setuptools]
-packages = ["pdfminer"]
+packages = ["core_pdfminer_six"]
+include-package-data = false
 script-files = [
     "tools/pdf2txt.py",
     "tools/dumppdf.py",
 ]
+
+[tool.setuptools.package-data]
+core_pdfminer_six = ["py.typed", "cmap/*.json.gz", "cmap/*.txt"]
 
 [tool.setuptools_scm]
 
@@ -126,7 +130,7 @@ strict_equality = true
 warn_unused_ignores = false
 
 [[tool.mypy.overrides]]
-module = "pdfminer.*"
+module = "core_pdfminer_six.*"
 disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]

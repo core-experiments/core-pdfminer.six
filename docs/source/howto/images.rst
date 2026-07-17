@@ -3,7 +3,7 @@
 How to extract images from a PDF
 ********************************
 
-Before you start, make sure you have :ref:`installed pdfminer.six<install>`.
+Before you start, make sure you have :ref:`installed core-pdfminer.six<install>`.
 The second thing you need is a PDF with images. If you don't have one,
 you can download `this research paper
 <https://www.robots.ox.ac.uk/~vgg/publications/2012/parkhi12a/parkhi12a.pdf>`_

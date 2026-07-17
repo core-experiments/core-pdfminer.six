@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import ClassVar
 
 from benchmarks.common import sample_path
-from pdfminer.high_level import extract_pages, extract_text
-from pdfminer.pdfpage import PDFPage
+from core_pdfminer_six.high_level import extract_pages, extract_text
+from core_pdfminer_six.pdfpage import PDFPage
 
 REPRESENTATIVE_PDFS = [
     "simple1.pdf",

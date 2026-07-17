@@ -2,10 +2,10 @@
 
 # -*- coding: utf-8 -*-
 
-from pdfminer.cmapdb import CMap, IdentityCMap, IdentityCMapByte
-from pdfminer.pdffont import PDFCIDFont
-from pdfminer.pdftypes import PDFStream
-from pdfminer.psparser import PSLiteral
+from core_pdfminer_six.cmapdb import CMap, IdentityCMap, IdentityCMapByte
+from core_pdfminer_six.pdffont import PDFCIDFont
+from core_pdfminer_six.pdftypes import PDFStream
+from core_pdfminer_six.psparser import PSLiteral
 
 
 class TestPDFEncoding:

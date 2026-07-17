@@ -13,18 +13,18 @@
 import os
 import sys
 
-import pdfminer
+import core_pdfminer_six
 
 sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../"))
 
 # -- Project information -----------------------------------------------------
 
-project = "pdfminer.six"
+project = "core-pdfminer.six"
 copyright = "2019, Yusuke Shinyama, Philippe Guglielmetti & Pieter Marsman"
 author = "Yusuke Shinyama, Philippe Guglielmetti & Pieter Marsman"
 
 # The full version, including alpha/beta/rc tags
-release = pdfminer.__version__
+release = core_pdfminer_six.__version__
 
 
 # -- General configuration ---------------------------------------------------

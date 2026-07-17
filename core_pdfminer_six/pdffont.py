@@ -10,9 +10,9 @@ from typing import (
     cast,
 )
 
-from pdfminer import settings
-from pdfminer.casting import safe_float, safe_rect_list
-from pdfminer.cmapdb import (
+from core_pdfminer_six import settings
+from core_pdfminer_six.casting import safe_float, safe_rect_list
+from core_pdfminer_six.cmapdb import (
     CMap,
     CMapBase,
     CMapDB,
@@ -21,13 +21,13 @@ from pdfminer.cmapdb import (
     IdentityUnicodeMap,
     UnicodeMap,
 )
-from pdfminer.encodingdb import EncodingDB, name2unicode
-from pdfminer.pdfexceptions import (
+from core_pdfminer_six.encodingdb import EncodingDB, name2unicode
+from core_pdfminer_six.pdfexceptions import (
     PDFException,
     PDFKeyError,
     PDFValueError,
 )
-from pdfminer.pdftypes import (
+from core_pdfminer_six.pdftypes import (
     PDFStream,
     dict_value,
     int_value,
@@ -37,8 +37,8 @@ from pdfminer.pdftypes import (
     resolve_all,
     stream_value,
 )
-from pdfminer.psexceptions import PSEOF
-from pdfminer.psparser import (
+from core_pdfminer_six.psexceptions import PSEOF
+from core_pdfminer_six.psparser import (
     KWD,
     LIT,
     PSKeyword,
@@ -46,7 +46,7 @@ from pdfminer.psparser import (
     PSStackParser,
     literal_name,
 )
-from pdfminer.utils import (
+from core_pdfminer_six.utils import (
     Matrix,
     Point,
     Rect,
@@ -56,7 +56,7 @@ from pdfminer.utils import (
 )
 
 if TYPE_CHECKING:
-    from pdfminer.pdfinterp import PDFResourceManager
+    from core_pdfminer_six.pdfinterp import PDFResourceManager
 
 log = logging.getLogger(__name__)
 
@@ -119,7 +119,7 @@ def get_widths2(seq: Iterable[object]) -> dict[int, tuple[float, Point]]:
 class FontMetricsDB:
     @classmethod
     def get_metrics(cls, fontname: str) -> tuple[dict[str, object], dict[str, int]]:
-        from pdfminer.fontmetrics import FONT_METRICS
+        from core_pdfminer_six.fontmetrics import FONT_METRICS
 
         return FONT_METRICS[fontname]
 

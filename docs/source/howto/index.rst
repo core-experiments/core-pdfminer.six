@@ -3,7 +3,7 @@
 How-to guides
 *************
 
-How-to guides help you to solve specific problems with pdfminer.six.
+How-to guides help you to solve specific problems with core-pdfminer.six.
 
 .. toctree::
     :maxdepth: 1

@@ -7,8 +7,8 @@ Therefore lowercase unittest variants are added.
 
 import pytest
 
-from pdfminer.encodingdb import EncodingDB, name2unicode
-from pdfminer.psparser import PSLiteral
+from core_pdfminer_six.encodingdb import EncodingDB, name2unicode
+from core_pdfminer_six.psparser import PSLiteral
 
 
 def test_name2unicode_name_in_agl():

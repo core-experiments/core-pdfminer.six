@@ -84,7 +84,7 @@ Grouping lines into boxes
 
 The second step is grouping lines in a meaningful way. Each line has a
 bounding box that is determined by the bounding boxes of the characters that
-it contains. Like grouping characters, pdfminer.six uses the bounding boxes
+it contains. Like grouping characters, core-pdfminer.six uses the bounding boxes
 to group the lines.
 
 Lines that are both horizontally overlapping and vertically close are grouped.
@@ -120,7 +120,7 @@ Working with rotated characters
 
 The algorithm described above assumes that all characters have the same
 orientation. However, any writing direction is possible in a PDF. To
-accommodate for this, pdfminer.six allows detecting vertical writing with the
+accommodate for this, core-pdfminer.six allows detecting vertical writing with the
 `detect_vertical` parameter. This will apply all the grouping steps as if the
 pdf was rotated 90 (or 270) degrees
 

@@ -3,7 +3,7 @@
 How to extract AcroForm interactive form fields from a PDF using PDFMiner
 *************************************************************************
 
-Before you start, make sure you have :ref:`installed pdfminer.six<install>`.
+Before you start, make sure you have :ref:`installed core-pdfminer.six<install>`.
 
 The second thing you need is a PDF with AcroForms (as found in PDF files with fillable forms or multiple choices). There are some examples of these in the GitHub repository under `samples/acroform`.
 
@@ -11,11 +11,11 @@ Only AcroForm interactive forms are supported, XFA forms are not supported.
 
 .. code-block:: python
 
-    from pdfminer.pdfparser import PDFParser
-    from pdfminer.pdfdocument import PDFDocument
-    from pdfminer.pdftypes import resolve1
-    from pdfminer.psparser import PSLiteral, PSKeyword
-    from pdfminer.utils import decode_text
+    from core_pdfminer_six.pdfparser import PDFParser
+    from core_pdfminer_six.pdfdocument import PDFDocument
+    from core_pdfminer_six.pdftypes import resolve1
+    from core_pdfminer_six.psparser import PSLiteral, PSKeyword
+    from core_pdfminer_six.utils import decode_text
 
 
     data = {}

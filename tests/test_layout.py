@@ -1,7 +1,7 @@
 import unittest
 
-from pdfminer.high_level import extract_pages
-from pdfminer.layout import (
+from core_pdfminer_six.high_level import extract_pages
+from core_pdfminer_six.layout import (
     LAParams,
     LTLayoutContainer,
     LTTextBoxHorizontal,
@@ -9,7 +9,7 @@ from pdfminer.layout import (
     LTTextLineHorizontal,
     LTTextLineVertical,
 )
-from pdfminer.utils import Plane
+from core_pdfminer_six.utils import Plane
 from tests.helpers import absolute_sample_path
 
 

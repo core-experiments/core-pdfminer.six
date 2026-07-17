@@ -2,10 +2,10 @@ import itertools
 from collections.abc import Iterable
 from typing import Any
 
-from pdfminer import settings
-from pdfminer.pdfparser import PDFSyntaxError
-from pdfminer.pdftypes import dict_value, int_value, list_value
-from pdfminer.utils import choplist
+from core_pdfminer_six import settings
+from core_pdfminer_six.pdfparser import PDFSyntaxError
+from core_pdfminer_six.pdftypes import dict_value, int_value, list_value
+from core_pdfminer_six.utils import choplist
 
 
 class NumberTree:

@@ -1,18 +1,15 @@
-pdfminer.six
-============
+core-pdfminer.six
+=================
 
-[![Continuous integration](https://github.com/pdfminer/pdfminer.six/actions/workflows/actions.yml/badge.svg)](https://github.com/pdfminer/pdfminer.six/actions/workflows/actions.yml)
-[![PyPI version](https://img.shields.io/pypi/v/pdfminer.six.svg)](https://pypi.python.org/pypi/pdfminer.six/)
-[![gitter](https://badges.gitter.im/pdfminer-six/Lobby.svg)](https://gitter.im/pdfminer-six/Lobby?utm_source=badge&utm_medium)
+[![Continuous integration](https://github.com/core-experiments/core-pdfminer.six/actions/workflows/actions.yml/badge.svg)](https://github.com/core-experiments/core-pdfminer.six/actions/workflows/actions.yml)
 
 *We fathom PDF*
 
-Pdfminer.six is a community maintained fork of the original PDFMiner. It is a tool for extracting information from PDF
-documents. It focuses on getting and analyzing text data. Pdfminer.six extracts the text from a page directly from the
-sourcecode of the PDF. It can also be used to get the exact location, font or color of the text.
+Core-pdfminer.six is a performance-focused fork of pdfminer.six. It extracts information from PDF documents, with a
+focus on text data, while retaining the familiar pdfminer.six API design under the `core_pdfminer_six` namespace.
 
-It is built in a modular way such that each component of pdfminer.six can be replaced easily. You can implement your own
-interpreter or rendering device that uses the power of pdfminer.six for other purposes than text analysis.
+It is modular, so individual components can be replaced. You can implement your own interpreter or rendering device for
+uses beyond text analysis.
 
 Check out the full documentation on
 [Read the Docs](https://pdfminersix.readthedocs.io).
@@ -40,14 +37,14 @@ How to use
 ----------
 
 * Install Python 3.10 or newer.
-* Install pdfminer.six.
+* Install core-pdfminer.six.
   ```bash
-  pip install pdfminer.six
+  pip install core-pdfminer.six
 
 * (Optionally) install extra dependencies for extracting images.
 
   ```bash
-  pip install 'pdfminer.six[image]'
+  pip install 'core-pdfminer.six[image]'
 
 * Use the command-line interface to extract text from pdf.
 
@@ -56,7 +53,7 @@ How to use
 
 * Or use it with Python.
   ```python
-  from pdfminer.high_level import extract_text
+  from core_pdfminer_six.high_level import extract_text
 
   text = extract_text("example.pdf")
   print(text)
@@ -71,8 +68,7 @@ Please note that as a community-maintained project with limited maintainer avail
 
 To get started:
 1. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and coding standards
-2. Check out the [open issues](https://github.com/pdfminer/pdfminer.six/issues) to find something to work on
-3. Join the discussion on [Gitter](https://gitter.im/pdfminer-six/Lobby) if you have questions
+2. Check out the [open issues](https://github.com/core-experiments/core-pdfminer.six/issues) to find something to work on
 
 Acknowledgement
 ---------------

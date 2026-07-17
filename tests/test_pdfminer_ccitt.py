@@ -1,4 +1,4 @@
-from pdfminer.ccitt import CCITTFaxDecoder, CCITTG4Parser
+from core_pdfminer_six.ccitt import CCITTFaxDecoder, CCITTG4Parser
 
 
 class TestCCITTG4Parser:

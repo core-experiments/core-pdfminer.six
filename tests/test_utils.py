@@ -3,8 +3,8 @@ import pathlib
 
 import pytest
 
-from pdfminer.layout import LTComponent
-from pdfminer.utils import (
+from core_pdfminer_six.layout import LTComponent
+from core_pdfminer_six.utils import (
     Matrix,
     Plane,
     Point,

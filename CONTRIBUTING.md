@@ -10,7 +10,7 @@ Any contribution is appreciated! You might want to:
 
 ## How can I contribute?
 
-* Use [issues](https://github.com/pdfminer/pdfminer.six/issues) to report bugs and features
+* Use [issues](https://github.com/core-experiments/core-pdfminer.six/issues) to report bugs and features
     - If you report a bug in the results for a particular pdf, include that pdf. This allows others to replicate the
      issue.
 * Fix issues by [creating pull requests](https://help.github.com/en/articles/creating-a-pull-request).
@@ -58,8 +58,8 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management and
 1. Clone the repository
 
     ```sh
-    git clone https://github.com/pdfminer/pdfminer.six
-    cd pdfminer.six
+    git clone https://github.com/core-experiments/core-pdfminer.six
+    cd core-pdfminer.six
     ```
 
 2. Install uv

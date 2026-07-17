@@ -1,15 +1,15 @@
 from io import BytesIO
 from typing import TYPE_CHECKING, BinaryIO, Union
 
-from pdfminer import settings
-from pdfminer.casting import safe_int
-from pdfminer.pdfexceptions import PDFException
-from pdfminer.pdftypes import PDFObjRef, PDFStream, dict_value, int_value
-from pdfminer.psexceptions import PSEOF
-from pdfminer.psparser import KWD, PSKeyword, PSStackParser
+from core_pdfminer_six import settings
+from core_pdfminer_six.casting import safe_int
+from core_pdfminer_six.pdfexceptions import PDFException
+from core_pdfminer_six.pdftypes import PDFObjRef, PDFStream, dict_value, int_value
+from core_pdfminer_six.psexceptions import PSEOF
+from core_pdfminer_six.psparser import KWD, PSKeyword, PSStackParser
 
 if TYPE_CHECKING:
-    from pdfminer.pdfdocument import PDFDocument
+    from core_pdfminer_six.pdfdocument import PDFDocument
 
 
 class PDFSyntaxError(PDFException):

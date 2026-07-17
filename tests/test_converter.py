@@ -1,10 +1,10 @@
 import io
 from tempfile import TemporaryFile
 
-from pdfminer.converter import PDFConverter, PDFLayoutAnalyzer
-from pdfminer.high_level import extract_pages
-from pdfminer.layout import LTChar, LTContainer, LTCurve, LTLine, LTRect
-from pdfminer.pdfinterp import PDFGraphicState
+from core_pdfminer_six.converter import PDFConverter, PDFLayoutAnalyzer
+from core_pdfminer_six.high_level import extract_pages
+from core_pdfminer_six.layout import LTChar, LTContainer, LTCurve, LTLine, LTRect
+from core_pdfminer_six.pdfinterp import PDFGraphicState
 from tests.helpers import absolute_sample_path
 
 
@@ -355,10 +355,10 @@ class TestColorSpace:
         - Uncolored patterns with CMYK (5 operands: c,m,y,k + pattern name)
         - Invalid patterns (non-PSLiteral operands) trigger warnings
         """
-        from pdfminer.converter import PDFPageAggregator
-        from pdfminer.layout import LAParams
-        from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
-        from pdfminer.psparser import PSLiteral
+        from core_pdfminer_six.converter import PDFPageAggregator
+        from core_pdfminer_six.layout import LAParams
+        from core_pdfminer_six.pdfinterp import PDFPageInterpreter, PDFResourceManager
+        from core_pdfminer_six.psparser import PSLiteral
 
         # Create minimal PDF with Pattern color space
         # We'll test the interpreter methods directly

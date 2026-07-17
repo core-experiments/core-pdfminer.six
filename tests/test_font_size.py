@@ -1,5 +1,5 @@
-from pdfminer.high_level import extract_pages
-from pdfminer.layout import LTChar, LTTextBox
+from core_pdfminer_six.high_level import extract_pages
+from core_pdfminer_six.layout import LTChar, LTTextBox
 from tests.helpers import absolute_sample_path
 
 

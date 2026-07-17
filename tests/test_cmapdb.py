@@ -2,7 +2,7 @@
 
 import struct
 
-from pdfminer.cmapdb import IdentityCMap, IdentityCMapByte
+from core_pdfminer_six.cmapdb import IdentityCMap, IdentityCMapByte
 
 
 def test_identity_cmap_odd_length_buffer():

@@ -4,7 +4,7 @@ include *.txt
 include *.md
 include *.py
 graft cmaprsrc
-graft pdfminer
+graft core_pdfminer_six
 graft tools
 global-exclude *.pyc
 prune samples

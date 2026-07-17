@@ -4,10 +4,10 @@ import sys
 from io import BytesIO
 from typing import ClassVar
 
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfparser import PDFParser
-from pdfminer.psexceptions import PSEOF
-from pdfminer.psparser import PSBaseParser, PSKeyword, PSStackParser
+from core_pdfminer_six.pdfdocument import PDFDocument
+from core_pdfminer_six.pdfparser import PDFParser
+from core_pdfminer_six.psexceptions import PSEOF
+from core_pdfminer_six.psparser import PSBaseParser, PSKeyword, PSStackParser
 
 
 class BenchmarkStackParser(PSStackParser[PSKeyword]):

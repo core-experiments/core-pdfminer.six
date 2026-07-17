@@ -1,6 +1,6 @@
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfparser import PDFParser
+from core_pdfminer_six.pdfdocument import PDFDocument
+from core_pdfminer_six.pdfpage import PDFPage
+from core_pdfminer_six.pdfparser import PDFParser
 from tests.helpers import absolute_sample_path
 
 

@@ -3,7 +3,7 @@
 How to resolve the target page of ToC entries
 *********************************************
 
-pdfminer.six allows to access the Table of Contents (or "Outlines" as called in
+core-pdfminer.six allows to access the Table of Contents (or "Outlines" as called in
 the PDF internal structure) of a document through the method
 :meth:`PDFDocument.get_outlines`.
 
@@ -12,8 +12,8 @@ A minimal example would be:
 .. code-block:: python
 
    from pathlib import Path
-   from pdfminer.pdfparser import PDFParser, PDFSyntaxError
-   from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines
+   from core_pdfminer_six.pdfparser import PDFParser, PDFSyntaxError
+   from core_pdfminer_six.pdfdocument import PDFDocument, PDFNoOutlines
 
 
    file_name = Path("...")
@@ -50,18 +50,18 @@ question we can refer to the section *12.3.3 Document Outline* of the
   `PDF Reference <https://www.adobe.com/go/pdfreference/>`__ states, we refer
   the reader to the chapter *12.3.2 Destinations* for more information on the
   topic.
-* **A** (:obj:`pdfminer.pdftypes.PDFObjRef`, `optional`): Alternatively to using
+* **A** (:obj:`core_pdfminer_six.pdftypes.PDFObjRef`, `optional`): Alternatively to using
   a destination, the target of an entry can also be specified as an action.
   Again, actions can get somewhat complicated, so we refer the reader to the
   chapter *12.6 Actions* of the reference.
-* **SE** (:obj:`pdfminer.pdftypes.PDFObjRef`, `optional`): This field contains
+* **SE** (:obj:`core_pdfminer_six.pdftypes.PDFObjRef`, `optional`): This field contains
   the structure element the entry points at. More information about structure
   elements can be found in the chapter *14.7.2 Structure Hierarchy*. It is worth
   mentioning that most PDFs will not include this field, using **Dest** or **A**
   instead, or if they do, they might still include a destination (**Dest**) to
   keep compatibility with PDF versions previous to 1.3.
 
-Unfortunately, pdfminer.six doesn't expose the page number that each of the
+Unfortunately, core-pdfminer.six doesn't expose the page number that each of the
 entries targets. However, once we know what each of the fields above mean, we
 can implement a ToC-entry page number resolver ourselves:
 
@@ -70,10 +70,10 @@ can implement a ToC-entry page number resolver ourselves:
    from enum import Enum, auto
    from pathlib import Path
    from typing import Any, Optional
-   from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines
-   from pdfminer.pdfpage import PDFPage, LITERAL_PAGE
-   from pdfminer.pdfparser import PDFParser, PDFSyntaxError
-   from pdfminer.pdftypes import PDFObjRef
+   from core_pdfminer_six.pdfdocument import PDFDocument, PDFNoOutlines
+   from core_pdfminer_six.pdfpage import PDFPage, LITERAL_PAGE
+   from core_pdfminer_six.pdfparser import PDFParser, PDFSyntaxError
+   from core_pdfminer_six.pdftypes import PDFObjRef
 
 
    class PDFRefType(Enum):
@@ -96,7 +96,7 @@ can implement a ToC-entry page number resolver ourselves:
           are out of the scope of this resolver.
 
        Attributes:
-           document (:obj:`pdfminer.pdfdocument.PDFDocument`):
+           document (:obj:`core_pdfminer_six.pdfdocument.PDFDocument`):
                The document that contains the references.
            objid_to_pagenum (:obj:`dict[int, int]`):
                Mapping from an object id to the number of the page that contains

@@ -3,12 +3,12 @@
 Extract text from a PDF using the commandline
 *********************************************
 
-pdfminer.six has several tools that can be used from the command line. The
+core-pdfminer.six has several tools that can be used from the command line. The
 command-line tools are aimed at users that occasionally want to extract text
 from a pdf.
 
 Take a look at the high-level or composable interface if you want to use
-pdfminer.six programmatically.
+core-pdfminer.six programmatically.
 
 Examples
 ========

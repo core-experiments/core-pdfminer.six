@@ -9,10 +9,10 @@ import sys
 from collections.abc import Container, Iterable
 from typing import Any
 
-import pdfminer.high_level
-from pdfminer.layout import LAParams
-from pdfminer.pdfexceptions import PDFValueError
-from pdfminer.utils import AnyIO
+import core_pdfminer_six.high_level
+from core_pdfminer_six.layout import LAParams
+from core_pdfminer_six.pdfexceptions import PDFValueError
+from core_pdfminer_six.utils import AnyIO
 
 logging.basicConfig()
 
@@ -60,13 +60,13 @@ def extract_text(
             codec = "utf-8"
         for fname in files:
             with open(fname, "rb") as fp:
-                pdfminer.high_level.extract_text_to_fp(fp, **locals())
+                core_pdfminer_six.high_level.extract_text_to_fp(fp, **locals())
     else:
         # Use context manager for file output, ensuring proper cleanup
         with open(outfile, "wb") as outfp:
             for fname in files:
                 with open(fname, "rb") as fp:
-                    pdfminer.high_level.extract_text_to_fp(fp, **locals())
+                    core_pdfminer_six.high_level.extract_text_to_fp(fp, **locals())
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -83,7 +83,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--version",
         "-v",
         action="version",
-        version=f"pdfminer.six v{pdfminer.__version__}",
+        version=f"core-pdfminer.six v{core_pdfminer_six.__version__}",
     )
     parser.add_argument(
         "--debug",

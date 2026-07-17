@@ -4,17 +4,17 @@ import struct
 from io import BytesIO
 from typing import BinaryIO, Literal
 
-from pdfminer.jbig2 import JBIG2StreamReader, JBIG2StreamWriter
-from pdfminer.layout import LTImage
-from pdfminer.pdfcolor import (
+from core_pdfminer_six.jbig2 import JBIG2StreamReader, JBIG2StreamWriter
+from core_pdfminer_six.layout import LTImage
+from core_pdfminer_six.pdfcolor import (
     LITERAL_DEVICE_CMYK,
     LITERAL_DEVICE_GRAY,
     LITERAL_DEVICE_RGB,
     LITERAL_INLINE_DEVICE_GRAY,
     LITERAL_INLINE_DEVICE_RGB,
 )
-from pdfminer.pdfexceptions import PDFValueError
-from pdfminer.pdftypes import (
+from core_pdfminer_six.pdfexceptions import PDFValueError
+from core_pdfminer_six.pdftypes import (
     LITERALS_DCT_DECODE,
     LITERALS_FLATE_DECODE,
     LITERALS_JBIG2_DECODE,
@@ -22,9 +22,9 @@ from pdfminer.pdftypes import (
 )
 
 PIL_ERROR_MESSAGE = (
-    "Could not import Pillow. This dependency of pdfminer.six is not "
+    "Could not import Pillow. This dependency of core-pdfminer.six is not "
     "installed by default. You need it to to save jpg images to a file. Install it "
-    "with `pip install 'pdfminer.six[image]'`"
+    "with `pip install 'core-pdfminer.six[image]'`"
 )
 
 

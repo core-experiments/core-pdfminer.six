@@ -1,6 +1,6 @@
 import collections
 
-from pdfminer.psparser import LIT
+from core_pdfminer_six.psparser import LIT
 
 LITERAL_DEVICE_GRAY = LIT("DeviceGray")
 LITERAL_DEVICE_RGB = LIT("DeviceRGB")

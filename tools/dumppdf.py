@@ -9,19 +9,19 @@ from argparse import ArgumentParser
 from collections.abc import Container, Iterable
 from typing import Any, TextIO, cast
 
-import pdfminer
-from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines, PDFXRefFallback
-from pdfminer.pdfexceptions import (
+import core_pdfminer_six
+from core_pdfminer_six.pdfdocument import PDFDocument, PDFNoOutlines, PDFXRefFallback
+from core_pdfminer_six.pdfexceptions import (
     PDFIOError,
     PDFObjectNotFound,
     PDFTypeError,
     PDFValueError,
 )
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdftypes import PDFObjRef, PDFStream, resolve1, stream_value
-from pdfminer.psparser import LIT, PSKeyword, PSLiteral
-from pdfminer.utils import isnumber
+from core_pdfminer_six.pdfpage import PDFPage
+from core_pdfminer_six.pdfparser import PDFParser
+from core_pdfminer_six.pdftypes import PDFObjRef, PDFStream, resolve1, stream_value
+from core_pdfminer_six.psparser import LIT, PSKeyword, PSLiteral
+from core_pdfminer_six.utils import isnumber
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -286,7 +286,7 @@ def create_parser() -> ArgumentParser:
         "--version",
         "-v",
         action="version",
-        version=f"pdfminer.six v{pdfminer.__version__}",
+        version=f"core-pdfminer.six v{core_pdfminer_six.__version__}",
     )
     parser.add_argument(
         "--debug",

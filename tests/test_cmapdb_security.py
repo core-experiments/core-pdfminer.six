@@ -1,6 +1,6 @@
 """Test CMap security fixes for CVE-2025-64512."""
 
-from pdfminer.cmapdb import CMapDB
+from core_pdfminer_six.cmapdb import CMapDB
 
 
 class TestCMapSecurity:

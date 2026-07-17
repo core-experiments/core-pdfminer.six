@@ -10,8 +10,8 @@ from typing import (
     cast,
 )
 
-from pdfminer.image import ImageWriter
-from pdfminer.layout import (
+from core_pdfminer_six.image import ImageWriter
+from core_pdfminer_six.layout import (
     LAParams,
     LTAnno,
     LTChar,
@@ -32,14 +32,14 @@ from pdfminer.layout import (
     LTTextLine,
     TextGroupElement,
 )
-from pdfminer.pdfcolor import PDFColorSpace
-from pdfminer.pdfdevice import PDFTextDevice
-from pdfminer.pdfexceptions import PDFValueError
-from pdfminer.pdffont import PDFFont, PDFUnicodeNotDefined
-from pdfminer.pdfinterp import PDFGraphicState, PDFResourceManager
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdftypes import PDFStream
-from pdfminer.utils import (
+from core_pdfminer_six.pdfcolor import PDFColorSpace
+from core_pdfminer_six.pdfdevice import PDFTextDevice
+from core_pdfminer_six.pdfexceptions import PDFValueError
+from core_pdfminer_six.pdffont import PDFFont, PDFUnicodeNotDefined
+from core_pdfminer_six.pdfinterp import PDFGraphicState, PDFResourceManager
+from core_pdfminer_six.pdfpage import PDFPage
+from core_pdfminer_six.pdftypes import PDFStream
+from core_pdfminer_six.utils import (
     AnyIO,
     Matrix,
     PathSegment,
@@ -881,7 +881,7 @@ class HOCRConverter(PDFConverter[AnyIO]):
             "<meta http-equiv='Content-Type' content='text/html;charset=utf-8' />\n",
         )
         self.write(
-            "<meta name='ocr-system' content='pdfminer.six HOCR Converter' />\n",
+            "<meta name='ocr-system' content='core-pdfminer.six HOCR Converter' />\n",
         )
         self.write(
             "  <meta name='ocr-capabilities' content='ocr_page ocr_block ocr_line ocrx_word'/>\n",

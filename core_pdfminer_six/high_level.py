@@ -1,4 +1,4 @@
-"""Functions that can be used for the most common use-cases for pdfminer.six"""
+"""Functions for the most common core-pdfminer.six use cases."""
 
 import logging
 import sys
@@ -6,19 +6,19 @@ from collections.abc import Container, Iterator
 from io import StringIO
 from typing import Any, BinaryIO, cast
 
-from pdfminer.converter import (
+from core_pdfminer_six.converter import (
     HOCRConverter,
     HTMLConverter,
     PDFPageAggregator,
     TextConverter,
     XMLConverter,
 )
-from pdfminer.layout import LAParams, LTPage
-from pdfminer.pdfdevice import PDFDevice, TagExtractor
-from pdfminer.pdfexceptions import PDFValueError
-from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
-from pdfminer.pdfpage import PDFPage
-from pdfminer.utils import AnyIO, FileOrName, open_filename
+from core_pdfminer_six.layout import LAParams, LTPage
+from core_pdfminer_six.pdfdevice import PDFDevice, TagExtractor
+from core_pdfminer_six.pdfexceptions import PDFValueError
+from core_pdfminer_six.pdfinterp import PDFPageInterpreter, PDFResourceManager
+from core_pdfminer_six.pdfpage import PDFPage
+from core_pdfminer_six.utils import AnyIO, FileOrName, open_filename
 
 
 def extract_text_to_fp(
@@ -51,7 +51,7 @@ def extract_text_to_fp(
     :param output_type: May be 'text', 'xml', 'html', 'hocr', 'tag'.
         Only 'text' works properly.
     :param codec: Text decoding codec
-    :param laparams: An LAParams object from pdfminer.layout. Default is None
+    :param laparams: An LAParams object from core_pdfminer_six.layout. Default is None
         but may not layout correctly.
     :param maxpages: How many pages to stop parsing after
     :param page_numbers: zero-indexed page numbers to operate on.
@@ -59,7 +59,7 @@ def extract_text_to_fp(
     :param scale: Scale factor
     :param rotation: Rotation factor
     :param layoutmode: Default is 'normal', see
-        pdfminer.converter.HTMLConverter
+        core_pdfminer_six.converter.HTMLConverter
     :param output_dir: If given, creates an ImageWriter for extracted images.
     :param strip_control: Does what it says on the tin
     :param debug: Output more logging data
@@ -73,7 +73,7 @@ def extract_text_to_fp(
 
     imagewriter = None
     if output_dir:
-        from pdfminer.image import ImageWriter
+        from core_pdfminer_six.image import ImageWriter
 
         imagewriter = ImageWriter(output_dir)
 
@@ -163,7 +163,7 @@ def extract_text(
     :param maxpages: The maximum number of pages to parse
     :param caching: If resources should be cached
     :param codec: Text decoding codec
-    :param laparams: An LAParams object from pdfminer.layout. If None, uses
+    :param laparams: An LAParams object from core_pdfminer_six.layout. If None, uses
         some default settings that often work well.
     :return: a string containing all of the text extracted.
     """
@@ -204,7 +204,7 @@ def extract_pages(
     :param page_numbers: List of zero-indexed page numbers to extract.
     :param maxpages: The maximum number of pages to parse
     :param caching: If resources should be cached
-    :param laparams: An LAParams object from pdfminer.layout. If None, uses
+    :param laparams: An LAParams object from core_pdfminer_six.layout. If None, uses
         some default settings that often work well.
     :return: LTPage objects
     """

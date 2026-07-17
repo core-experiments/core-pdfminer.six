@@ -2,11 +2,11 @@ import itertools
 
 import pytest
 
-from pdfminer.pdfdocument import PDFDocument, PDFNoPageLabels
-from pdfminer.pdfexceptions import PDFObjectNotFound
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdftypes import dict_value, int_value
+from core_pdfminer_six.pdfdocument import PDFDocument, PDFNoPageLabels
+from core_pdfminer_six.pdfexceptions import PDFObjectNotFound
+from core_pdfminer_six.pdfpage import PDFPage
+from core_pdfminer_six.pdfparser import PDFParser
+from core_pdfminer_six.pdftypes import dict_value, int_value
 from tests.helpers import absolute_sample_path
 
 

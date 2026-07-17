@@ -4,20 +4,20 @@ Extract text from a PDF using Python - part 2
 *********************************************
 
 The command line tools and the high-level API are just shortcuts for often
-used combinations of pdfminer.six components. You can use these components to
-modify pdfminer.six to your own needs.
+used combinations of core-pdfminer.six components. You can use these components to
+modify core-pdfminer.six to your own needs.
 
 For example, to extract the text from a PDF file and save it in a python
 variable::
 
     from io import StringIO
 
-    from pdfminer.converter import TextConverter
-    from pdfminer.layout import LAParams
-    from pdfminer.pdfdocument import PDFDocument
-    from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-    from pdfminer.pdfpage import PDFPage
-    from pdfminer.pdfparser import PDFParser
+    from core_pdfminer_six.converter import TextConverter
+    from core_pdfminer_six.layout import LAParams
+    from core_pdfminer_six.pdfdocument import PDFDocument
+    from core_pdfminer_six.pdfinterp import PDFResourceManager, PDFPageInterpreter
+    from core_pdfminer_six.pdfpage import PDFPage
+    from core_pdfminer_six.pdfparser import PDFParser
 
     output_string = StringIO()
     with open('samples/simple1.pdf', 'rb') as in_file:

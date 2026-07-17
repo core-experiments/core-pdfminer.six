@@ -6,13 +6,13 @@ import atheris
 from fuzzing.fuzzed_data_provider import PdfminerFuzzedDataProvider
 
 with atheris.instrument_imports():
+    from core_pdfminer_six.high_level import extract_pages
+    from core_pdfminer_six.psexceptions import PSException
     from fuzzing.utils import (
         generate_layout_parameters,
         is_valid_byte_stream,
         prepare_pdfminer_fuzzing,
     )
-    from pdfminer.high_level import extract_pages
-    from pdfminer.psexceptions import PSException
 
 
 def fuzz_one_input(data: bytes) -> None:

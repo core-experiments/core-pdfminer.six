@@ -1,7 +1,7 @@
 import itertools
 from typing import Any
 
-from pdfminer.utils import Matrix, Rect
+from core_pdfminer_six.utils import Matrix, Rect
 
 _FloatTriple = tuple[float, float, float]
 _FloatQuadruple = tuple[float, float, float, float]

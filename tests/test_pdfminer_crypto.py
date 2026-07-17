@@ -2,11 +2,11 @@
 
 import binascii
 
-from pdfminer.arcfour import Arcfour
-from pdfminer.ascii85 import ascii85decode, asciihexdecode
-from pdfminer.lzw import lzwdecode
-from pdfminer.runlength import rldecode
-from pdfminer.utils import unpad_aes
+from core_pdfminer_six.arcfour import Arcfour
+from core_pdfminer_six.ascii85 import ascii85decode, asciihexdecode
+from core_pdfminer_six.lzw import lzwdecode
+from core_pdfminer_six.runlength import rldecode
+from core_pdfminer_six.utils import unpad_aes
 
 
 def hex(b):

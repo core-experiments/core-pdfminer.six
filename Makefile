@@ -5,7 +5,7 @@ MKDIR=mkdir
 
 CONV_CMAP=$(PYTHON) tools/conv_cmap.py
 CMAPSRC=cmaprsrc
-CMAPDST=pdfminer/cmap
+CMAPDST=core_pdfminer_six/cmap
 
 .PHONY: cmap cmap_clean
 cmap: $(CMAPDST) $(CMAPDST)/to-unicode-Adobe-CNS1.json.gz $(CMAPDST)/to-unicode-Adobe-GB1.json.gz \
@@ -52,7 +52,7 @@ lint-fix:  ## Run ruff linter and fix auto-fixable issues
 
 .PHONY: type-check
 type-check:  ## Run mypy type checker
-	uv run mypy --install-types --non-interactive --show-error-codes fuzzing pdfminer tools tests
+	uv run mypy --install-types --non-interactive --show-error-codes fuzzing core_pdfminer_six tools tests
 
 .PHONY: test
 test:  ## Run tests with pytest

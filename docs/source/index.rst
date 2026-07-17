@@ -1,36 +1,28 @@
-Welcome to pdfminer.six's documentation!
-****************************************
+Welcome to core-pdfminer.six's documentation!
+*********************************************
 
-.. image:: https://travis-ci.org/pdfminer/pdfminer.six.svg?branch=master
-    :target: https://travis-ci.org/pdfminer/pdfminer.six
-    :alt: Travis-ci build badge
-
-.. image:: https://img.shields.io/pypi/v/pdfminer.six.svg
-    :target: https://pypi.python.org/pypi/pdfminer.six/
-    :alt: PyPi version badge
-
-.. image:: https://badges.gitter.im/pdfminer-six/Lobby.svg
-    :target: https://gitter.im/pdfminer-six/Lobby?utm_source=badge&utm_medium
-    :alt: gitter badge
+.. image:: https://github.com/core-experiments/core-pdfminer.six/actions/workflows/actions.yml/badge.svg
+    :target: https://github.com/core-experiments/core-pdfminer.six/actions/workflows/actions.yml
+    :alt: Continuous integration status
 
 We fathom PDF.
 
-Pdfminer.six is a python package for extracting information from PDF documents.
+Core-pdfminer.six is a performance-focused Python package for extracting information from PDF documents.
 
-Check out the source on `github <https://github.com/pdfminer/pdfminer.six>`_.
+Check out the source on `GitHub <https://github.com/core-experiments/core-pdfminer.six>`_.
 
 Content
 =======
 
 This documentation is organized into four sections (according to the `Diátaxis
 documentation framework <https://diataxis.fr>`_). The
-:ref:`tutorial` section helps you setup and use pdfminer.six for the first
-time. Read this section if this is your first time working with pdfminer.six.
+:ref:`tutorial` section helps you setup and use core-pdfminer.six for the first
+time. Read this section if this is your first time working with core-pdfminer.six.
 The :ref:`howto` offers specific recipes for solving common problems.
 Take a look at the :ref:`topic` if you want more background information on
-how pdfminer.six works internally. The :ref:`reference` provides
+how core-pdfminer.six works internally. The :ref:`reference` provides
 detailed api documentation for all the common classes and functions in
-pdfminer.six.
+core-pdfminer.six.
 
 .. toctree::
     :maxdepth: 2
@@ -60,26 +52,26 @@ Installation instructions
 =========================
 
 * Install Python 3.10 or newer.
-* Install pdfminer.six.
+* Install core-pdfminer.six.
 
 ::
-    $ pip install pdfminer.six`
+    $ pip install core-pdfminer.six
 
 * (Optionally) install extra dependencies for extracting images.
 
 ::
-    $ pip install 'pdfminer.six[image]'`
+    $ pip install 'core-pdfminer.six[image]'
 
 * Use the command-line interface to extract text from pdf.
 
 ::
-    $ pdf2txt.py example.pdf`
+    $ pdf2txt.py example.pdf
 
 * Or use it with Python.
 
 .. code-block:: python
 
-    from pdfminer.high_level import extract_text
+    from core_pdfminer_six.high_level import extract_text
 
     text = extract_text("example.pdf")
     print(text)
@@ -89,6 +81,6 @@ Installation instructions
 Contributing
 ============
 
-We welcome any contributors to pdfminer.six! But, before doing anything, take
+We welcome any contributors to core-pdfminer.six! But, before doing anything, take
 a look at the `contribution guide
-<https://github.com/pdfminer/pdfminer.six/blob/master/CONTRIBUTING.md>`_.
+<https://github.com/core-experiments/core-pdfminer.six/blob/main/CONTRIBUTING.md>`_.

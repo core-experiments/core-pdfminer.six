@@ -2,8 +2,8 @@ from typing import Any
 
 import pytest
 
-from pdfminer.casting import safe_float, safe_rect_list
-from pdfminer.utils import Rect
+from core_pdfminer_six.casting import safe_float, safe_rect_list
+from core_pdfminer_six.utils import Rect
 
 
 @pytest.mark.parametrize(

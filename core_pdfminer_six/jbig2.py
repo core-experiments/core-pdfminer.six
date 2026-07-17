@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from struct import calcsize, pack, unpack
 from typing import BinaryIO, ClassVar, cast
 
-from pdfminer.pdfexceptions import PDFValueError
+from core_pdfminer_six.pdfexceptions import PDFValueError
 
 # segment structure base
 SEG_STRUCT = [

@@ -8,7 +8,7 @@ Composable API
 LAParams
 ========
 
-.. currentmodule:: pdfminer.layout
+.. currentmodule:: core_pdfminer_six.layout
 .. autoclass:: LAParams
 
 Todo:

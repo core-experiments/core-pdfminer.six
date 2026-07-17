@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import ClassVar, cast
 
-from pdfminer.layout import LAParams, LTChar, LTComponent, LTPage
-from pdfminer.pdfcolor import PREDEFINED_COLORSPACE
-from pdfminer.pdffont import PDFFont
-from pdfminer.pdfinterp import PDFGraphicState
-from pdfminer.utils import Plane
+from core_pdfminer_six.layout import LAParams, LTChar, LTComponent, LTPage
+from core_pdfminer_six.pdfcolor import PREDEFINED_COLORSPACE
+from core_pdfminer_six.pdffont import PDFFont
+from core_pdfminer_six.pdfinterp import PDFGraphicState
+from core_pdfminer_six.utils import Plane
 
 
 class BenchmarkFont:

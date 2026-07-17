@@ -2,17 +2,17 @@ from typing import Any
 
 import pytest
 
-from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams
-from pdfminer.pdffont import PDFCIDFont, PDFFont, get_widths
-from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
-from pdfminer.pdftypes import PDFObjRef
-from pdfminer.psparser import PSLiteral
+from core_pdfminer_six.converter import PDFPageAggregator
+from core_pdfminer_six.layout import LAParams
+from core_pdfminer_six.pdffont import PDFCIDFont, PDFFont, get_widths
+from core_pdfminer_six.pdfinterp import PDFPageInterpreter, PDFResourceManager
+from core_pdfminer_six.pdftypes import PDFObjRef
+from core_pdfminer_six.psparser import PSLiteral
 from tests.helpers import absolute_sample_path
 
 
 def test_get_cmap():
-    """Test if cmap file is read from pdfminer/cmap
+    """Test if cmap file is read from core_pdfminer_six/cmap
 
     Regression test for https://github.com/pdfminer/pdfminer.six/issues/391
     """
@@ -67,10 +67,10 @@ def test_pdffont_get_widths_object_ref():
 def test_cmap_font_12():
     from collections.abc import Generator
 
-    from pdfminer.pdfpage import PDFPage
+    from core_pdfminer_six.pdfpage import PDFPage
 
     def pdf_to_pages(file_name: str) -> Generator[PDFPage, None, None]:
-        from pdfminer.pdfpage import PDFPage
+        from core_pdfminer_six.pdfpage import PDFPage
 
         with open(file_name, "rb") as fp:
             yield from PDFPage.get_pages(fp)

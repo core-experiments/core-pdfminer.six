@@ -4,19 +4,19 @@ from collections.abc import Callable, Mapping, Sequence
 from io import BytesIO
 from typing import Any, Union, cast
 
-from pdfminer import settings
-from pdfminer.casting import (
+from core_pdfminer_six import settings
+from core_pdfminer_six.casting import (
     safe_cmyk,
     safe_float,
     safe_int,
     safe_matrix,
     safe_rgb,
 )
-from pdfminer.cmapdb import CMap, CMapBase, CMapDB
-from pdfminer.pdfcolor import PREDEFINED_COLORSPACE, PDFColorSpace
-from pdfminer.pdfdevice import PDFDevice
-from pdfminer.pdfexceptions import PDFException, PDFValueError
-from pdfminer.pdffont import (
+from core_pdfminer_six.cmapdb import CMap, CMapBase, CMapDB
+from core_pdfminer_six.pdfcolor import PREDEFINED_COLORSPACE, PDFColorSpace
+from core_pdfminer_six.pdfdevice import PDFDevice
+from core_pdfminer_six.pdfexceptions import PDFException, PDFValueError
+from core_pdfminer_six.pdffont import (
     PDFCIDFont,
     PDFFont,
     PDFFontError,
@@ -24,8 +24,8 @@ from pdfminer.pdffont import (
     PDFType1Font,
     PDFType3Font,
 )
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdftypes import (
+from core_pdfminer_six.pdfpage import PDFPage
+from core_pdfminer_six.pdftypes import (
     LITERALS_ASCII85_DECODE,
     PDFObjRef,
     PDFStream,
@@ -35,8 +35,8 @@ from pdfminer.pdftypes import (
     resolve1,
     stream_value,
 )
-from pdfminer.psexceptions import PSEOF, PSTypeError
-from pdfminer.psparser import (
+from core_pdfminer_six.psexceptions import PSEOF, PSTypeError
+from core_pdfminer_six.psparser import (
     KWD,
     LIT,
     PSKeyword,
@@ -46,7 +46,7 @@ from pdfminer.psparser import (
     keyword_name,
     literal_name,
 )
-from pdfminer.utils import (
+from core_pdfminer_six.utils import (
     MATRIX_IDENTITY,
     Matrix,
     PathSegment,

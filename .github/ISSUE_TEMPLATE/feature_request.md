@@ -9,7 +9,7 @@ assignees: ''
 
 **Feature request**
 
-Thanks for your suggestion on improving pdfminer.six. To helps us discuss and
+Thanks for your suggestion on improving core-core-pdfminer.six. To helps us discuss and
 implement this request, please make sure to include the following information:
 
 - A description of the feature you would like to have

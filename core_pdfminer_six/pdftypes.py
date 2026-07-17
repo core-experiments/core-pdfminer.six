@@ -11,17 +11,17 @@ from typing import (
 )
 from warnings import warn
 
-from pdfminer import pdfexceptions, settings
-from pdfminer.ascii85 import ascii85decode, asciihexdecode
-from pdfminer.ccitt import ccittfaxdecode
-from pdfminer.lzw import lzwdecode
-from pdfminer.pdfexceptions import PDFKeyError
-from pdfminer.psparser import LIT, PSObject
-from pdfminer.runlength import rldecode
-from pdfminer.utils import apply_png_predictor, apply_tiff_predictor
+from core_pdfminer_six import pdfexceptions, settings
+from core_pdfminer_six.ascii85 import ascii85decode, asciihexdecode
+from core_pdfminer_six.ccitt import ccittfaxdecode
+from core_pdfminer_six.lzw import lzwdecode
+from core_pdfminer_six.pdfexceptions import PDFKeyError
+from core_pdfminer_six.psparser import LIT, PSObject
+from core_pdfminer_six.runlength import rldecode
+from core_pdfminer_six.utils import apply_png_predictor, apply_tiff_predictor
 
 if TYPE_CHECKING:
-    from pdfminer.pdfdocument import PDFDocument
+    from core_pdfminer_six.pdfdocument import PDFDocument
 
 logger = logging.getLogger(__name__)
 

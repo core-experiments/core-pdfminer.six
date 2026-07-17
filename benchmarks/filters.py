@@ -4,12 +4,12 @@ import base64
 import zlib
 from typing import ClassVar
 
-from pdfminer.ascii85 import ascii85decode, asciihexdecode
-from pdfminer.lzw import lzwdecode
-from pdfminer.pdftypes import PDFStream
-from pdfminer.psparser import LIT
-from pdfminer.runlength import rldecode
-from pdfminer.utils import apply_png_predictor, decode_text
+from core_pdfminer_six.ascii85 import ascii85decode, asciihexdecode
+from core_pdfminer_six.lzw import lzwdecode
+from core_pdfminer_six.pdftypes import PDFStream
+from core_pdfminer_six.psparser import LIT
+from core_pdfminer_six.runlength import rldecode
+from core_pdfminer_six.utils import apply_png_predictor, decode_text
 
 PAYLOAD = bytes(range(256)) * 256
 

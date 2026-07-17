@@ -16,10 +16,10 @@ from typing import (
     cast,
 )
 
-from pdfminer.pdfexceptions import PDFTypeError, PDFValueError
+from core_pdfminer_six.pdfexceptions import PDFTypeError, PDFValueError
 
 if TYPE_CHECKING:
-    from pdfminer.layout import LTComponent
+    from core_pdfminer_six.layout import LTComponent
 
 # from sys import maxint as INF doesn't work anymore under Python3, but PDF
 # still uses 32 bits ints

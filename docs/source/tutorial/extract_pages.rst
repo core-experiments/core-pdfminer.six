@@ -8,7 +8,7 @@ we can use :ref:`api_extract_pages`:
 
 .. code-block:: python
 
-   from pdfminer.high_level import extract_pages
+   from core_pdfminer_six.high_level import extract_pages
    for page_layout in extract_pages("test.pdf"):
        for element in page_layout:
            print(element)
@@ -24,8 +24,8 @@ Let's say we want to extract all of the text. We could do:
 
 .. code-block:: python
 
-   from pdfminer.high_level import extract_pages
-   from pdfminer.layout import LTTextContainer
+   from core_pdfminer_six.high_level import extract_pages
+   from core_pdfminer_six.layout import LTTextContainer
    for page_layout in extract_pages("test.pdf"):
        for element in page_layout:
            if isinstance(element, LTTextContainer):
@@ -35,8 +35,8 @@ Or, we could extract the fontname or size of each individual character:
 
 .. code-block:: python
 
-   from pdfminer.high_level import extract_pages
-   from pdfminer.layout import LTTextContainer, LTChar
+   from core_pdfminer_six.high_level import extract_pages
+   from core_pdfminer_six.layout import LTTextContainer, LTChar
    for page_layout in extract_pages("test.pdf"):
        for element in page_layout:
            if isinstance(element, LTTextContainer):

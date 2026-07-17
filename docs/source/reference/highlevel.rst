@@ -8,7 +8,7 @@ High-level functions API
 extract_text
 ============
 
-.. currentmodule:: pdfminer.high_level
+.. currentmodule:: core_pdfminer_six.high_level
 .. autofunction:: extract_text
 
 
@@ -17,7 +17,7 @@ extract_text
 extract_text_to_fp
 ==================
 
-.. currentmodule:: pdfminer.high_level
+.. currentmodule:: core_pdfminer_six.high_level
 .. autofunction:: extract_text_to_fp
 
 
@@ -26,5 +26,5 @@ extract_text_to_fp
 extract_pages
 =============
 
-.. currentmodule:: pdfminer.high_level
+.. currentmodule:: core_pdfminer_six.high_level
 .. autofunction:: extract_pages

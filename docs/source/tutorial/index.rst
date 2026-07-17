@@ -3,7 +3,7 @@
 Tutorials
 *********
 
-Tutorials help you get started with specific parts of pdfminer.six.
+Tutorials help you get started with specific parts of core-pdfminer.six.
 
 .. toctree::
     :maxdepth: 1

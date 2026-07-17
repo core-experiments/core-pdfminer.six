@@ -13,8 +13,8 @@ from typing import (
     cast,
 )
 
-from pdfminer import psexceptions, settings
-from pdfminer.utils import choplist
+from core_pdfminer_six import psexceptions, settings
+from core_pdfminer_six.utils import choplist
 
 log = logging.getLogger(__name__)
 

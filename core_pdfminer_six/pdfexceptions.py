@@ -1,4 +1,4 @@
-from pdfminer.psexceptions import PSException
+from core_pdfminer_six.psexceptions import PSException
 
 
 class PDFException(PSException):

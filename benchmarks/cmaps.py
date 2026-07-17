@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from pdfminer.cmapdb import CMap, CMapDB
-from pdfminer.encodingdb import EncodingDB
+from core_pdfminer_six.cmapdb import CMap, CMapDB
+from core_pdfminer_six.encodingdb import EncodingDB
 
 
 class IdentityCMapDecoding:

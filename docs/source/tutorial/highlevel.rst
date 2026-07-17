@@ -10,7 +10,7 @@ The most simple way to extract text from a PDF is to use
 
 .. doctest::
 
-    >>> from pdfminer.high_level import extract_text
+    >>> from core_pdfminer_six.high_level import extract_text
     >>> text = extract_text('samples/simple1.pdf')
     >>> print(repr(text))
     'Hello \n\nWorld\n\nHello \n\nWorld\n\nH e l l o  \n\nW o r l d\n\nH e l l o  \n\nW o r l d\n\n\x0c'
@@ -39,7 +39,7 @@ To read text from a PDF and print it on the command line:
 .. doctest::
 
     >>> from io import StringIO
-    >>> from pdfminer.high_level import extract_text_to_fp
+    >>> from core_pdfminer_six.high_level import extract_text_to_fp
     >>> output_string = StringIO()
     >>> with open('samples/simple1.pdf', 'rb') as fin:
     ...     extract_text_to_fp(fin, output_string)
@@ -51,8 +51,8 @@ Or to convert it to html and use layout analysis:
 .. doctest::
 
     >>> from io import StringIO
-    >>> from pdfminer.high_level import extract_text_to_fp
-    >>> from pdfminer.layout import LAParams
+    >>> from core_pdfminer_six.high_level import extract_text_to_fp
+    >>> from core_pdfminer_six.layout import LAParams
     >>> output_string = StringIO()
     >>> with open('samples/simple1.pdf', 'rb') as fin:
     ...     extract_text_to_fp(fin, output_string, laparams=LAParams(),

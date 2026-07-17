@@ -2,7 +2,7 @@ from collections.abc import Iterator
 from io import BytesIO
 from typing import BinaryIO, cast
 
-from pdfminer.pdfexceptions import PDFEOFError, PDFException
+from core_pdfminer_six.pdfexceptions import PDFEOFError, PDFException
 
 
 class CorruptDataError(PDFException):

@@ -4,7 +4,7 @@ import logging
 
 import atheris
 
-from pdfminer.layout import LAParams
+from core_pdfminer_six.layout import LAParams
 
 PDF_MAGIC_BYTES = b"%PDF-"
 

@@ -27,17 +27,17 @@ from typing import (
     cast,
 )
 
-from pdfminer.encodingdb import name2unicode
-from pdfminer.pdfexceptions import PDFException, PDFTypeError
-from pdfminer.psexceptions import PSEOF, PSSyntaxError
-from pdfminer.psparser import (
+from core_pdfminer_six.encodingdb import name2unicode
+from core_pdfminer_six.pdfexceptions import PDFException, PDFTypeError
+from core_pdfminer_six.psexceptions import PSEOF, PSSyntaxError
+from core_pdfminer_six.psparser import (
     KWD,
     PSKeyword,
     PSLiteral,
     PSStackParser,
     literal_name,
 )
-from pdfminer.utils import choplist, nunpack
+from core_pdfminer_six.utils import choplist, nunpack
 
 log = logging.getLogger(__name__)
 

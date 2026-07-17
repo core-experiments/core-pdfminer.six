@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "project": "pdfminer.six",
+  "project": "core-pdfminer.six",
   "project_url": "https://github.com/core-experiments/core-pdfminer.six",
   "repo": ".",
   "branches": ["main"],

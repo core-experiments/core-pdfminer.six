@@ -10,18 +10,18 @@ from typing import (
     cast,
 )
 
-from pdfminer import settings
-from pdfminer.arcfour import Arcfour
-from pdfminer.casting import safe_int
-from pdfminer.data_structures import NumberTree
-from pdfminer.pdfexceptions import (
+from core_pdfminer_six import settings
+from core_pdfminer_six.arcfour import Arcfour
+from core_pdfminer_six.casting import safe_int
+from core_pdfminer_six.data_structures import NumberTree
+from core_pdfminer_six.pdfexceptions import (
     PDFException,
     PDFKeyError,
     PDFObjectNotFound,
     PDFTypeError,
 )
-from pdfminer.pdfparser import PDFParser, PDFStreamParser, PDFSyntaxError
-from pdfminer.pdftypes import (
+from core_pdfminer_six.pdfparser import PDFParser, PDFStreamParser, PDFSyntaxError
+from core_pdfminer_six.pdftypes import (
     DecipherCallable,
     PDFStream,
     decipher_all,
@@ -32,9 +32,9 @@ from pdfminer.pdftypes import (
     stream_value,
     uint_value,
 )
-from pdfminer.psexceptions import PSEOF
-from pdfminer.psparser import KWD, LIT, literal_name
-from pdfminer.utils import (
+from core_pdfminer_six.psexceptions import PSEOF
+from core_pdfminer_six.psparser import KWD, LIT, literal_name
+from core_pdfminer_six.utils import (
     choplist,
     decode_text,
     format_int_alpha,
@@ -576,7 +576,7 @@ class PDFStandardSecurityHandlerV5(PDFStandardSecurityHandlerV4):
             # saslprep expects non-empty strings, apparently
             if not password:
                 return b""
-            from pdfminer._saslprep import saslprep
+            from core_pdfminer_six._saslprep import saslprep
 
             password = saslprep(password)
         return password.encode("utf-8")[:127]
