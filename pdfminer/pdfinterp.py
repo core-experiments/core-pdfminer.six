@@ -30,6 +30,7 @@ from pdfminer.pdftypes import (
     PDFObjRef,
     PDFStream,
     dict_value,
+    int_value,
     list_value,
     resolve1,
     stream_value,
@@ -407,7 +408,7 @@ class PDFPageInterpreter:
         def get_colorspace(spec: object) -> PDFColorSpace | None:
             name = literal_name(spec[0]) if isinstance(spec, list) else literal_name(spec)
             if name == "ICCBased" and isinstance(spec, list) and len(spec) >= 2:
-                return PDFColorSpace(name, stream_value(spec[1])["N"])
+                return PDFColorSpace(name, int_value(stream_value(spec[1])["N"]))
             elif name == "DeviceN" and isinstance(spec, list) and len(spec) >= 2:
                 return PDFColorSpace(name, len(list_value(spec[1])))
             else:
