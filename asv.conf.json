@@ -5,7 +5,7 @@
   "repo": ".",
   "branches": ["main"],
   "environment_type": "virtualenv",
-  "pythons": ["3.10", "3.14"],
+  "pythons": ["3.10", "3.11", "3.12"],
   "build_command": [
     "python -m pip install build",
     "python -m build --wheel --outdir {build_cache_dir} {build_dir}"
