@@ -54,10 +54,7 @@ def saslprep(data: str, prohibit_unassigned_code_points: bool = True) -> str:
         to ``True`` (unassigned code points are prohibited).
     :return: The SASLprep'ed version of `data`.
     """
-    if prohibit_unassigned_code_points:
-        prohibited = (*_PROHIBITED, stringprep.in_table_a1)
-    else:
-        prohibited = _PROHIBITED
+    prohibited = (*_PROHIBITED, stringprep.in_table_a1) if prohibit_unassigned_code_points else _PROHIBITED
 
     # RFC3454 section 2, step 1 - Map
     # RFC4013 section 2.1 mappings
@@ -66,11 +63,7 @@ def saslprep(data: str, prohibit_unassigned_code_points: bool = True) -> str:
     in_table_c12 = stringprep.in_table_c12
     in_table_b1 = stringprep.in_table_b1
     data = "".join(
-        [
-            "\u0020" if in_table_c12(elt) else elt
-            for elt in data
-            if not in_table_b1(elt)
-        ],
+        ["\u0020" if in_table_c12(elt) else elt for elt in data if not in_table_b1(elt)],
     )
 
     # RFC3454 section 2, step 2 - Normalize

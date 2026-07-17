@@ -68,9 +68,7 @@ class TestDumpPDF(unittest.TestCase):
     def assert_de_DE(self, path):
         absolute_path = absolute_sample_path(path)
         with tempfile.NamedTemporaryFile("w+") as outfh:
-            dumppdf.main(
-                ["--password", "foo", "--objects", "1", "-o", outfh.name, absolute_path]
-            )
+            dumppdf.main(["--password", "foo", "--objects", "1", "-o", outfh.name, absolute_path])
             outfh.flush()
             outfh.seek(0, 0)
             for spam in outfh:

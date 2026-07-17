@@ -138,8 +138,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-R",
         default=0,
         type=int,
-        help="The number of degrees to rotate the PDF "
-        "before other types of processing.",
+        help="The number of degrees to rotate the PDF before other types of processing.",
     )
 
     la_params = LAParams()  # will be used for defaults
@@ -227,8 +226,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-o",
         type=str,
         default="-",
-        help="Path to file where output is written. "
-        'Or "-" (default) to write to stdout.',
+        help='Path to file where output is written. Or "-" (default) to write to stdout.',
     )
     output_params.add_argument(
         "--output_type",
@@ -248,8 +246,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--output-dir",
         "-O",
         default=None,
-        help="The output directory to put extracted images in. If not given, "
-        "images are not extracted.",
+        help="The output directory to put extracted images in. If not given, images are not extracted.",
     )
     output_params.add_argument(
         "--layoutmode",
@@ -269,8 +266,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-s",
         type=float,
         default=1.0,
-        help="The amount of zoom to use when generating html file. "
-        "Only used when output_type is html.",
+        help="The amount of zoom to use when generating html file. Only used when output_type is html.",
     )
     output_params.add_argument(
         "--strip-control",

@@ -10,9 +10,6 @@ from typing import (
     cast,
 )
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-
 from pdfminer import settings
 from pdfminer.arcfour import Arcfour
 from pdfminer.casting import safe_int
@@ -177,7 +174,6 @@ class PDFXRef(PDFBaseXRef):
                         genno_b,
                     )
 
-        log.debug("xref objects: %r", self.offsets)
         self.load_trailer(parser)
 
     def load_trailer(self, parser: PDFParser) -> None:
@@ -191,7 +187,6 @@ class PDFXRef(PDFBaseXRef):
                 raise PDFNoValidXRef("Unexpected EOF - file corrupted") from None
             (_, dic) = x[0]
         self.trailer.update(dict_value(dic))
-        log.debug("trailer=%r", self.trailer)
 
     def get_trailer(self) -> dict[str, Any]:
         return self.trailer
@@ -219,7 +214,6 @@ class PDFXRefFallback(PDFXRef):
             if line_bytes.startswith(b"trailer"):
                 parser.seek(pos)
                 self.load_trailer(parser)
-                log.debug("trailer: %r", self.trailer)
                 break
             line = line_bytes.decode("latin-1")  # default pdf encoding
             m = self.PDFOBJ_CUE.match(line)
@@ -283,13 +277,6 @@ class PDFXRefStream(PDFBaseXRef):
         self.data = stream.get_data()
         self.entlen = self.fl1 + self.fl2 + self.fl3
         self.trailer = stream.attrs
-        log.debug(
-            "xref stream: objid=%s, fields=%d,%d,%d",
-            ", ".join(map(repr, self.ranges)),
-            self.fl1,
-            self.fl2,
-            self.fl3,
-        )
 
     def get_trailer(self) -> dict[str, Any]:
         return self.trailer
@@ -333,9 +320,7 @@ class PDFXRefStream(PDFBaseXRef):
 
 
 class PDFStandardSecurityHandler:
-    PASSWORD_PADDING = (
-        b"(\xbfN^Nu\x8aAd\x00NV\xff\xfa\x01\x08..\x00\xb6\xd0h>\x80/\x0c\xa9\xfedSiz"
-    )
+    PASSWORD_PADDING = b"(\xbfN^Nu\x8aAd\x00NV\xff\xfa\x01\x08..\x00\xb6\xd0h>\x80/\x0c\xa9\xfedSiz"
     supported_revisions: tuple[int, ...] = (2, 3)
 
     def __init__(
@@ -401,10 +386,7 @@ class PDFStandardSecurityHandler:
         # See https://github.com/pdfminer/pdfminer.six/issues/186
         hash.update(struct.pack("<L", self.p))  # 4
         hash.update(self.docid[0])  # 5
-        if (
-            self.r >= 4
-            and not cast(PDFStandardSecurityHandlerV4, self).encrypt_metadata
-        ):
+        if self.r >= 4 and not cast(PDFStandardSecurityHandlerV4, self).encrypt_metadata:
             hash.update(b"\xff\xff\xff\xff")
         result = hash.digest()
         n = 5
@@ -525,13 +507,11 @@ class PDFStandardSecurityHandlerV4(PDFStandardSecurityHandler):
         return data
 
     def decrypt_aes128(self, objid: int, genno: int, data: bytes) -> bytes:
+        from cryptography.hazmat.backends import default_backend
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
         assert self.key is not None
-        key = (
-            self.key
-            + struct.pack("<L", objid)[:3]
-            + struct.pack("<L", genno)[:2]
-            + b"sAlT"
-        )
+        key = self.key + struct.pack("<L", objid)[:3] + struct.pack("<L", genno)[:2] + b"sAlT"
         hash = md5(key)
         key = hash.digest()[: min(len(key), 16)]
         initialization_vector = data[:16]
@@ -567,6 +547,9 @@ class PDFStandardSecurityHandlerV5(PDFStandardSecurityHandlerV4):
             return None
 
     def authenticate(self, password: str) -> bytes | None:
+        from cryptography.hazmat.backends import default_backend
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
         password_b = self._normalize_password(password)
         hash = self._password_hash(password_b, self.o_validation_salt, self.u)
         if hash == self.o_hash:
@@ -653,11 +636,16 @@ class PDFStandardSecurityHandlerV5(PDFStandardSecurityHandlerV4):
         return sum(b % 3 for b in input_bytes) % 3
 
     def _aes_cbc_encrypt(self, key: bytes, iv: bytes, data: bytes) -> bytes:
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
         encryptor = cipher.encryptor()  # type: ignore
         return encryptor.update(data) + encryptor.finalize()  # type: ignore
 
     def decrypt_aes256(self, objid: int, genno: int, data: bytes) -> bytes:
+        from cryptography.hazmat.backends import default_backend
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
         initialization_vector = data[:16]
         ciphertext = data[16:]
         assert self.key is not None
@@ -838,7 +826,6 @@ class PDFDocument:
         """
         if not self.xrefs:
             raise PDFException("PDFDocument is not initialized")
-        log.debug("getobj: objid=%r", objid)
         obj: object  # Initialize to satisfy mypy; always assigned in branches below
         genno: int
         if objid in self._cached_objs:
@@ -865,7 +852,6 @@ class PDFDocument:
                     continue
             else:
                 raise PDFObjectNotFound(objid)
-            log.debug("register: objid=%r: %r", objid, obj)
             if self.caching:
                 self._cached_objs[objid] = (obj, genno)
         return obj
@@ -957,11 +943,7 @@ class PDFDocument:
         prev = b""
         for line in parser.revreadlines():
             line = line.strip()
-            log.debug("find_xref: %r", line)
-
             if line == b"startxref":
-                log.debug("xref found: pos=%r", prev)
-
                 if not prev.isdigit():
                     raise PDFNoValidXRef(f"Invalid xref position, no digit: {prev!r}")
 
@@ -989,38 +971,36 @@ class PDFDocument:
         xrefs: list[PDFBaseXRef],
     ) -> None:
         """Reads XRefs from the given location."""
-        if start in self._xrefpos:
-            raise PDFNoValidXRef(f"Detected circular xref chain at {start}")
-            return
-        self._xrefpos.add(start)
-        parser.seek(start)
-        parser.reset()
-        try:
-            (pos, token) = parser.nexttoken()
-        except PSEOF as err:
-            raise PDFNoValidXRef("Unexpected EOF") from err
-        log.debug("read_xref_from: start=%d, token=%r", start, token)
-        if isinstance(token, int):
-            # XRefStream: PDF-1.5
-            parser.seek(pos)
+        pending = [start]
+        while pending:
+            start = pending.pop()
+            if start in self._xrefpos:
+                raise PDFNoValidXRef(f"Detected circular xref chain at {start}")
+            self._xrefpos.add(start)
+            parser.seek(start)
             parser.reset()
-            xref: PDFBaseXRef = PDFXRefStream()
-            xref.load(parser)
-        else:
-            if token is parser.KEYWORD_XREF:
-                parser.nextline()
-            xref = PDFXRef()
-            xref.load(parser)
-        xrefs.append(xref)
-        trailer = xref.get_trailer()
-        log.debug("trailer: %r", trailer)
-        if "XRefStm" in trailer:
-            pos = int_value(trailer["XRefStm"])
-            self.read_xref_from(parser, pos, xrefs)
-        if "Prev" in trailer:
-            # find previous xref
-            pos = int_value(trailer["Prev"])
-            self.read_xref_from(parser, pos, xrefs)
+            try:
+                (pos, token) = parser.nexttoken()
+            except PSEOF as err:
+                raise PDFNoValidXRef("Unexpected EOF") from err
+            if isinstance(token, int):
+                # XRefStream: PDF-1.5
+                parser.seek(pos)
+                parser.reset()
+                xref: PDFBaseXRef = PDFXRefStream()
+                xref.load(parser)
+            else:
+                if token is parser.KEYWORD_XREF:
+                    parser.nextline()
+                xref = PDFXRef()
+                xref.load(parser)
+            xrefs.append(xref)
+            trailer = xref.get_trailer()
+            if "Prev" in trailer:
+                # Process this after XRefStm to preserve the recursive traversal order.
+                pending.append(int_value(trailer["Prev"]))
+            if "XRefStm" in trailer:
+                pending.append(int_value(trailer["XRefStm"]))
 
 
 class PageLabels(NumberTree):

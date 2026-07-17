@@ -70,8 +70,7 @@ def main() -> int:
         print(__doc__)
         print("\nError: Expected 2 arguments", file=sys.stderr)
         print(
-            "Usage: python tools/convert_cmaps_to_json.py "
-            "<input.pickle.gz> <output.json.gz>",
+            "Usage: python tools/convert_cmaps_to_json.py <input.pickle.gz> <output.json.gz>",
             file=sys.stderr,
         )
         return 1

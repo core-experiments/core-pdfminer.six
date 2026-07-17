@@ -1,7 +1,6 @@
-import logging
 import re
 from collections.abc import Iterable
-from typing import ClassVar, cast
+from typing import ClassVar
 
 from pdfminer.glyphlist import glyphname2unicode
 from pdfminer.latin_enc import ENCODING
@@ -9,8 +8,6 @@ from pdfminer.pdfexceptions import PDFKeyError
 from pdfminer.psparser import PSLiteral
 
 HEXADECIMAL = re.compile(r"[0-9a-fA-F]+")
-
-log = logging.getLogger(__name__)
 
 
 def name2unicode(name: str) -> str:
@@ -46,10 +43,7 @@ def name2unicode(name: str) -> str:
         name_without_uni = name.strip("uni")
 
         if HEXADECIMAL.match(name_without_uni) and len(name_without_uni) % 4 == 0:
-            unicode_digits = [
-                int(name_without_uni[i : i + 4], base=16)
-                for i in range(0, len(name_without_uni), 4)
-            ]
+            unicode_digits = [int(name_without_uni[i : i + 4], base=16) for i in range(0, len(name_without_uni), 4)]
             for digit in unicode_digits:
                 raise_key_error_for_invalid_unicode(digit)
             characters = map(chr, unicode_digits)
@@ -64,8 +58,7 @@ def name2unicode(name: str) -> str:
             return chr(unicode_digit)
 
     raise PDFKeyError(
-        f'Could not convert unicode name "{name}" to character because '
-        "it does not match specification",
+        f'Could not convert unicode name "{name}" to character because it does not match specification',
     )
 
 
@@ -77,8 +70,7 @@ def raise_key_error_for_invalid_unicode(unicode_digit: int) -> None:
     """
     if 55295 < unicode_digit < 57344:
         raise PDFKeyError(
-            f"Unicode digit {unicode_digit} is invalid because "
-            "it is in the range D800 through DFFF",
+            f"Unicode digit {unicode_digit} is invalid because it is in the range D800 through DFFF",
         )
 
 
@@ -119,9 +111,9 @@ class EncodingDB:
                 if isinstance(x, int):
                     cid = x
                 elif isinstance(x, PSLiteral):
-                    try:
-                        cid2unicode[cid] = name2unicode(cast(str, x.name))
-                    except (KeyError, ValueError) as e:
-                        log.debug(str(e))
+                    try:  # noqa: SIM105 - avoiding context-manager overhead in this hot loop
+                        cid2unicode[cid] = name2unicode(x.name)  # type: ignore[arg-type]
+                    except (KeyError, ValueError):
+                        pass
                     cid += 1
         return cid2unicode

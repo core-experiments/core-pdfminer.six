@@ -125,14 +125,12 @@ class ImageWriter:
             name = self._save_bmp(image, width, height, (width + 7) // 8, image.bits)
 
         elif image.bits == 8 and (
-            LITERAL_DEVICE_RGB in image.colorspace
-            or LITERAL_INLINE_DEVICE_RGB in image.colorspace
+            LITERAL_DEVICE_RGB in image.colorspace or LITERAL_INLINE_DEVICE_RGB in image.colorspace
         ):
             name = self._save_bmp(image, width, height, width * 3, image.bits * 3)
 
         elif image.bits == 8 and (
-            LITERAL_DEVICE_GRAY in image.colorspace
-            or LITERAL_INLINE_DEVICE_GRAY in image.colorspace
+            LITERAL_DEVICE_GRAY in image.colorspace or LITERAL_INLINE_DEVICE_GRAY in image.colorspace
         ):
             name = self._save_bmp(image, width, height, width, image.bits)
 
@@ -199,10 +197,7 @@ class ImageWriter:
                     global_streams.append(params["JBIG2Globals"].resolve())
 
             if len(global_streams) > 1:
-                msg = (
-                    "There should never be more than one JBIG2Globals "
-                    "associated with a JBIG2 embedded image"
-                )
+                msg = "There should never be more than one JBIG2Globals associated with a JBIG2 embedded image"
                 raise PDFValueError(msg)
             if len(global_streams) == 1:
                 input_stream.write(global_streams[0].get_data().rstrip(b"\n"))
@@ -278,10 +273,7 @@ class ImageWriter:
     @staticmethod
     def _is_jbig2_iamge(image: LTImage) -> bool:
         filters = image.stream.get_filters()
-        for filter_name, _params in filters:
-            if filter_name in LITERALS_JBIG2_DECODE:
-                return True
-        return False
+        return any(filter_name in LITERALS_JBIG2_DECODE for filter_name, _params in filters)
 
     def _create_unique_image_name(self, image: LTImage, ext: str) -> tuple[str, str]:
         name = image.name + ext

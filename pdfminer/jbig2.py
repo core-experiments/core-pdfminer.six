@@ -178,10 +178,9 @@ class JBIG2StreamReader:
         field: bytes,
     ) -> int:
         if length:
-            if (
-                cast(JBIG2SegmentFlags, segment["flags"])["type"]
-                == SEG_TYPE_IMMEDIATE_GEN_REGION
-            ) and (length == DATA_LEN_UNKNOWN):
+            if (cast(JBIG2SegmentFlags, segment["flags"])["type"] == SEG_TYPE_IMMEDIATE_GEN_REGION) and (
+                length == DATA_LEN_UNKNOWN
+            ):
                 raise NotImplementedError(
                     "Working with unknown segment length is not implemented yet",
                 )
@@ -222,10 +221,7 @@ class JBIG2StreamWriter:
             if fix_last_page:
                 seg_page = cast(int, segment.get("page_assoc"))
 
-                if (
-                    cast(JBIG2SegmentFlags, segment["flags"])["type"]
-                    == SEG_TYPE_END_OF_PAGE
-                ):
+                if cast(JBIG2SegmentFlags, segment["flags"])["type"] == SEG_TYPE_END_OF_PAGE:
                     current_page = None
                 elif seg_page:
                     current_page = seg_page
@@ -273,10 +269,7 @@ class JBIG2StreamWriter:
         for field_format, name in SEG_STRUCT:
             value = segment.get(name)
             encoder = getattr(self, f"encode_{name}", None)
-            if callable(encoder):
-                field = encoder(value, segment)
-            else:
-                field = pack(field_format, value)
+            field = encoder(value, segment) if callable(encoder) else pack(field_format, value)
             data += field
         return data
 
@@ -288,11 +281,7 @@ class JBIG2StreamWriter:
         if "page_assoc_long" in value:
             flags |= HEADER_FLAG_PAGE_ASSOC_LONG if value["page_assoc_long"] else flags
         else:
-            flags |= (
-                HEADER_FLAG_PAGE_ASSOC_LONG
-                if cast(int, segment.get("page", 0)) > 255
-                else flags
-            )
+            flags |= HEADER_FLAG_PAGE_ASSOC_LONG if cast(int, segment.get("page", 0)) > 255 else flags
 
         flags |= mask_value(SEG_TYPE_MASK, value["type"])
 

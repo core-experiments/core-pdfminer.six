@@ -33,17 +33,9 @@ class TestAscii85:
         assert ascii85decode(b"<~E,9)oF*2M7/c~") == b"pleasure."
         assert ascii85decode(b"<~E,9)oF*2M7/c~\n>") == b"pleasure."
         # Ensure that we don't miss actual ASCII85 digits
-        assert (
-            ascii85decode(b"<^BVT:K:=9<E)pd;BS_1:/aSV;ag~>")
-            == b"VARIOUS UTTER NONSENSE"
-        )
-        assert (
-            ascii85decode(b"<~<^BVT:K:=9<E)pd;BS_1:/aSV;ag~>")
-            == b"VARIOUS UTTER NONSENSE"
-        )
-        assert (
-            ascii85decode(b"<^BVT:K:=9<E)pd;BS_1:/aSV;ag~") == b"VARIOUS UTTER NONSENSE"
-        )
+        assert ascii85decode(b"<^BVT:K:=9<E)pd;BS_1:/aSV;ag~>") == b"VARIOUS UTTER NONSENSE"
+        assert ascii85decode(b"<~<^BVT:K:=9<E)pd;BS_1:/aSV;ag~>") == b"VARIOUS UTTER NONSENSE"
+        assert ascii85decode(b"<^BVT:K:=9<E)pd;BS_1:/aSV;ag~") == b"VARIOUS UTTER NONSENSE"
 
     def test_asciihexdecode(self):
         assert asciihexdecode(b"61 62 2e6364   65") == b"ab.cde"
@@ -55,18 +47,12 @@ class TestArcfour:
     def test(self):
         assert hex(Arcfour(b"Key").process(b"Plaintext")) == b"bbf316e8d940af0ad3"
         assert hex(Arcfour(b"Wiki").process(b"pedia")) == b"1021bf0420"
-        assert (
-            hex(Arcfour(b"Secret").process(b"Attack at dawn"))
-            == b"45a01f645fc35b383552544b9bf5"
-        )
+        assert hex(Arcfour(b"Secret").process(b"Attack at dawn")) == b"45a01f645fc35b383552544b9bf5"
 
 
 class TestLzw:
     def test_lzwdecode(self):
-        assert (
-            lzwdecode(b"\x80\x0b\x60\x50\x22\x0c\x0c\x85\x01")
-            == b"\x2d\x2d\x2d\x2d\x2d\x41\x2d\x2d\x2d\x42"
-        )
+        assert lzwdecode(b"\x80\x0b\x60\x50\x22\x0c\x0c\x85\x01") == b"\x2d\x2d\x2d\x2d\x2d\x41\x2d\x2d\x2d\x42"
 
 
 class TestRunlength:
@@ -79,10 +65,7 @@ class TestAES:
         assert unpad_aes(b"\x10" * 16) == b""
         assert unpad_aes(b"0123456789abcdef" + b"\x10" * 16) == b"0123456789abcdef"
         assert unpad_aes(b"0123456789abc\x03\x03\x03") == b"0123456789abc"
-        assert (
-            unpad_aes(b"0123456789abcdef0123456789abc\x03\x03\x03")
-            == b"0123456789abcdef0123456789abc"
-        )
+        assert unpad_aes(b"0123456789abcdef0123456789abc\x03\x03\x03") == b"0123456789abcdef0123456789abc"
         assert unpad_aes(b"foo\x01bar\x01bazquux\01") == b"foo\x01bar\x01bazquux"
 
         # NOTE: As per the spec the following strings should be padded

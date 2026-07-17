@@ -463,8 +463,7 @@ class CCITTG4Parser(BitParser):
                 if self._color == 1 and self._refline[x1] != self._color:
                     break
             elif x1 == len(self._refline) or (
-                self._refline[x1 - 1] == self._color
-                and self._refline[x1] != self._color
+                self._refline[x1 - 1] == self._color and self._refline[x1] != self._color
             ):
                 break
             x1 += 1
@@ -487,8 +486,7 @@ class CCITTG4Parser(BitParser):
                 if self._color == 1 and self._refline[x1] != self._color:
                     break
             elif x1 == len(self._refline) or (
-                self._refline[x1 - 1] == self._color
-                and self._refline[x1] != self._color
+                self._refline[x1 - 1] == self._color and self._refline[x1] != self._color
             ):
                 break
             x1 += 1
@@ -497,8 +495,7 @@ class CCITTG4Parser(BitParser):
                 if self._color == 0 and self._refline[x1] == self._color:
                     break
             elif x1 == len(self._refline) or (
-                self._refline[x1 - 1] != self._color
-                and self._refline[x1] == self._color
+                self._refline[x1 - 1] != self._color and self._refline[x1] == self._color
             ):
                 break
             x1 += 1

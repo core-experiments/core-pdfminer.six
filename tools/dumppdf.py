@@ -158,10 +158,7 @@ def dumpoutline(
     with open(fname, "rb") as fp:
         parser = PDFParser(fp)
         doc = PDFDocument(parser, password)
-        pages = {
-            page.pageid: pageno
-            for (pageno, page) in enumerate(PDFPage.create_pages(doc), 1)
-        }
+        pages = {page.pageid: pageno for (pageno, page) in enumerate(PDFPage.create_pages(doc), 1)}
 
         def resolve_dest(dest: object) -> Any:
             if isinstance(dest, (str, bytes)):
@@ -214,14 +211,11 @@ def extractembedded(fname: str, password: str, extractdir: str) -> None:
         fileref = obj["EF"].get("UF") or obj["EF"].get("F")
         fileobj = doc.getobj(fileref.objid)
         if not isinstance(fileobj, PDFStream):
-            error_msg = (
-                f"unable to process PDF: reference for {filename!r} is not a PDFStream"
-            )
+            error_msg = f"unable to process PDF: reference for {filename!r} is not a PDFStream"
             raise PDFValueError(error_msg)
         if fileobj.get("Type") is not LITERAL_EMBEDDEDFILE:
             raise PDFValueError(
-                f"unable to process PDF: reference for {filename!r} "
-                "is not an EmbeddedFile",
+                f"unable to process PDF: reference for {filename!r} is not an EmbeddedFile",
             )
         path = os.path.join(extractdir, f"{objid:06d}-{filename}")
         if os.path.exists(path):
@@ -238,11 +232,7 @@ def extractembedded(fname: str, password: str, extractdir: str) -> None:
         for xref in doc.xrefs:
             for objid in xref.get_objids():
                 obj = doc.getobj(objid)
-                if (
-                    objid not in extracted_objids
-                    and isinstance(obj, dict)
-                    and obj.get("Type") is LITERAL_FILESPEC
-                ):
+                if objid not in extracted_objids and isinstance(obj, dict) and obj.get("Type") is LITERAL_FILESPEC:
                     extracted_objids.add(objid)
                     extract1(objid, obj)
 
@@ -376,8 +366,7 @@ def create_parser() -> ArgumentParser:
         "-o",
         type=str,
         default="-",
-        help='Path to file where output is written. Or "-" (default) to '
-        "write to stdout.",
+        help='Path to file where output is written. Or "-" (default) to write to stdout.',
     )
     codec_parser = output_params.add_mutually_exclusive_group()
     codec_parser.add_argument(
@@ -447,9 +436,7 @@ def main(argv: list[str] | None = None) -> None:
                     extractdir=None,
                 )
             elif args.extract_embedded:
-                extractembedded(
-                    fname, password=password, extractdir=args.extract_embedded
-                )
+                extractembedded(fname, password=password, extractdir=args.extract_embedded)
             else:
                 dumppdf(
                     outfp,

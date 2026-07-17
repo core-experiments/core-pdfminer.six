@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import contextlib
 import io
 import logging
 import re
+from collections import deque
 from collections.abc import Iterator
 from typing import (
     Any,
@@ -10,6 +10,7 @@ from typing import (
     Generic,
     TypeVar,
     Union,
+    cast,
 )
 
 from pdfminer import psexceptions, settings
@@ -85,9 +86,9 @@ class PSSymbolTable(Generic[_SymbolT]):
         self.klass: type[_SymbolT] = klass
 
     def intern(self, name: PSLiteral.NameType) -> _SymbolT:
-        if name in self.dict:
-            lit = self.dict[name]
-        else:
+        try:
+            return self.dict[name]
+        except KeyError:
             # Type confusion issue: PSKeyword always takes bytes as name
             #                       PSLiteral uses either str or bytes
             lit = self.klass(name)  # type: ignore[arg-type]
@@ -101,6 +102,8 @@ LIT = PSLiteralTable.intern
 KWD = PSKeywordTable.intern
 KEYWORD_PROC_BEGIN = KWD(b"{")
 KEYWORD_PROC_END = KWD(b"}")
+
+NORMAL_TOKEN_TYPES = frozenset((int, float, bytes, PSLiteral, str, bool))
 KEYWORD_ARRAY_BEGIN = KWD(b"[")
 KEYWORD_ARRAY_END = KWD(b"]")
 KEYWORD_DICT_BEGIN = KWD(b"<<")
@@ -176,7 +179,6 @@ class PSBaseParser:
 
     def seek(self, pos: int) -> None:
         """Seeks the parser to the given position."""
-        log.debug("seek: %r", pos)
         self.fp.seek(pos)
         # reset the status for nextline()
         self.bufpos = pos
@@ -186,7 +188,7 @@ class PSBaseParser:
         self._parse1 = self._parse_main
         self._curtoken = b""
         self._curtokenpos = 0
-        self._tokens: list[tuple[int, PSBaseParserToken]] = []
+        self._token: tuple[int, PSBaseParserToken] | None = None
         self.eof = False
 
     def fillbuf(self) -> bool:
@@ -225,8 +227,6 @@ class PSBaseParser:
             else:
                 linebuf += self.buf[self.charpos :]
                 self.charpos = len(self.buf)
-        log.debug("nextline: %r, %r", linepos, linebuf)
-
         return (linepos, linebuf)
 
     def revreadlines(self) -> Iterator[bytes]:
@@ -258,49 +258,104 @@ class PSBaseParser:
         if not m:
             return len(s)
         j = m.start(0)
-        c = s[j : j + 1]
+        c = s[j]
+        token = s[j : j + 1]
         self._curtokenpos = self.bufpos + j
-        if c == b"%":
+        if c == 0x25:  # %
             self._curtoken = b"%"
             self._parse1 = self._parse_comment
             return j + 1
-        elif c == b"/":
+        elif c == 0x2F:  # /
+            m = END_LITERAL.search(s, j + 1)
+            if m and s[m.start(0)] != 0x23:  # #
+                end = m.start(0)
+                raw_name = s[j + 1 : end]
+                try:
+                    name: str | bytes = str(raw_name, "utf-8")
+                except Exception:
+                    name = raw_name
+                self._token = (self._curtokenpos, LIT(name))
+                return end
             self._curtoken = b""
             self._parse1 = self._parse_literal
             return j + 1
-        elif c in b"-+" or c.isdigit():
-            self._curtoken = c
+        elif c in (0x2D, 0x2B) or 0x30 <= c <= 0x39:  # -+0-9
+            m = END_NUMBER.search(s, j + 1)
+            if m:
+                end = m.start(0)
+                if s[end] == 0x2E:  # .
+                    float_end = END_NUMBER.search(s, end + 1)
+                    if float_end:
+                        end = float_end.start(0)
+                        try:
+                            number: int | float = float(s[j:end])
+                        except ValueError:
+                            pass
+                        else:
+                            self._token = (self._curtokenpos, number)
+                        return end
+                else:
+                    try:
+                        number = int(s[j:end])
+                    except ValueError:
+                        pass
+                    else:
+                        self._token = (self._curtokenpos, number)
+                    return end
+            self._curtoken = token
             self._parse1 = self._parse_number
             return j + 1
-        elif c == b".":
-            self._curtoken = c
+        elif c == 0x2E:  # .
+            m = END_NUMBER.search(s, j + 1)
+            if m:
+                end = m.start(0)
+                try:
+                    number = float(s[j:end])
+                except ValueError:
+                    pass
+                else:
+                    self._token = (self._curtokenpos, number)
+                return end
+            self._curtoken = token
             self._parse1 = self._parse_float
             return j + 1
-        elif c.isalpha():
-            self._curtoken = c
+        elif 0x41 <= c <= 0x5A or 0x61 <= c <= 0x7A:  # A-Z or a-z
+            m = END_KEYWORD.search(s, j + 1)
+            if m:
+                end = m.start(0)
+                keyword = s[j:end]
+                if keyword == b"true":
+                    keyword_token: bool | PSKeyword = True
+                elif keyword == b"false":
+                    keyword_token = False
+                else:
+                    keyword_token = KWD(keyword)
+                self._token = (self._curtokenpos, keyword_token)
+                return end
+            self._curtoken = token
             self._parse1 = self._parse_keyword
             return j + 1
-        elif c == b"(":
+        elif c == 0x28:  # (
             self._curtoken = b""
             self.paren = 1
             self._parse1 = self._parse_string
             return j + 1
-        elif c == b"<":
+        elif c == 0x3C:  # <
             self._curtoken = b""
             self._parse1 = self._parse_wopen
             return j + 1
-        elif c == b">":
+        elif c == 0x3E:  # >
             self._curtoken = b""
             self._parse1 = self._parse_wclose
             return j + 1
-        elif c == b"\x00":
+        elif c == 0:
             return j + 1
         else:
-            self._add_token(KWD(c))
+            self._token = (self._curtokenpos, KWD(token))
             return j + 1
 
     def _add_token(self, obj: PSBaseParserToken) -> None:
-        self._tokens.append((self._curtokenpos, obj))
+        self._token = (self._curtokenpos, obj)
 
     def _parse_comment(self, s: bytes, i: int) -> int:
         m = EOL.search(s, i)
@@ -356,8 +411,12 @@ class PSBaseParser:
             self._curtoken += c
             self._parse1 = self._parse_float
             return j + 1
-        with contextlib.suppress(ValueError):
-            self._add_token(int(self._curtoken))
+        try:
+            token = int(self._curtoken)
+        except ValueError:
+            pass
+        else:
+            self._add_token(token)
         self._parse1 = self._parse_main
         return j
 
@@ -368,8 +427,12 @@ class PSBaseParser:
             return len(s)
         j = m.start(0)
         self._curtoken += s[i:j]
-        with contextlib.suppress(ValueError):
-            self._add_token(float(self._curtoken))
+        try:
+            token = float(self._curtoken)
+        except ValueError:
+            pass
+        else:
+            self._add_token(token)
         self._parse1 = self._parse_main
         return j
 
@@ -483,9 +546,9 @@ class PSBaseParser:
         if self.eof:
             # It's not really unexpected, come on now...
             raise PSEOF("Unexpected EOF")
-        while not self._tokens:
+        while self._token is None:
             try:
-                changed_stream = self.fillbuf()
+                changed_stream = self.charpos >= len(self.buf) and self.fillbuf()
                 if changed_stream and self._curtoken:
                     # Fixes #1157: if the stream is changed in the middle of a token,
                     # try to parse it by tacking on whitespace.
@@ -499,10 +562,10 @@ class PSBaseParser:
                 self.charpos = self._parse1(b"\n", 0)
                 self.eof = True
                 # Oh, so there wasn't actually a token there? OK.
-                if not self._tokens:
+                if self._token is None:
                     raise
-        token = self._tokens.pop(0)
-        log.debug("nexttoken: %r", token)
+        token = self._token
+        self._token = None
         return token
 
 
@@ -513,9 +576,7 @@ class PSBaseParser:
 #  * dict (via KEYWORD_DICT)
 #  * subclass-specific extensions (e.g. PDFStream, PDFObjRef) via ExtraT
 ExtraT = TypeVar("ExtraT")
-PSStackType = Union[
-    str, float, bool, PSLiteral, bytes, list[Any], dict[Any, Any], ExtraT
-]
+PSStackType = Union[str, float, bool, PSLiteral, bytes, list[Any], dict[Any, Any], ExtraT]
 PSStackEntry = tuple[int, PSStackType[ExtraT]]
 
 
@@ -528,7 +589,7 @@ class PSStackParser(PSBaseParser, Generic[ExtraT]):
         self.context: list[tuple[int, str | None, list[PSStackEntry[ExtraT]]]] = []
         self.curtype: str | None = None
         self.curstack: list[PSStackEntry[ExtraT]] = []
-        self.results: list[PSStackEntry[ExtraT]] = []
+        self.results: deque[PSStackEntry[ExtraT]] = deque()
 
     def seek(self, pos: int) -> None:
         PSBaseParser.seek(self, pos)
@@ -539,7 +600,7 @@ class PSStackParser(PSBaseParser, Generic[ExtraT]):
 
     def pop(self, n: int) -> list[PSStackEntry[ExtraT]]:
         objs = self.curstack[-n:]
-        del self.curstack[-n:]
+        self.curstack[-n:] = []
         return objs
 
     def popall(self) -> list[PSStackEntry[ExtraT]]:
@@ -548,23 +609,17 @@ class PSStackParser(PSBaseParser, Generic[ExtraT]):
         return objs
 
     def add_results(self, *objs: PSStackEntry[ExtraT]) -> None:
-        try:
-            log.debug("add_results: %r", objs)
-        except Exception:
-            log.debug("add_results: (unprintable object)")
         self.results.extend(objs)
 
     def start_type(self, pos: int, type: str) -> None:
         self.context.append((pos, self.curtype, self.curstack))
         (self.curtype, self.curstack) = (type, [])
-        log.debug("start_type: pos=%r, type=%r", pos, type)
 
     def end_type(self, type: str) -> tuple[int, list[PSStackType[ExtraT]]]:
         if self.curtype != type:
             raise PSTypeError(f"Type mismatch: {self.curtype!r} != {type!r}")
         objs = [obj for (_, obj) in self.curstack]
         (pos, self.curtype, self.curstack) = self.context.pop()
-        log.debug("end_type: pos=%r, type=%r, objs=%r", pos, type, objs)
         return (pos, objs)
 
     def do_keyword(self, pos: int, token: PSKeyword) -> None:
@@ -580,56 +635,48 @@ class PSStackParser(PSBaseParser, Generic[ExtraT]):
         """
         while not self.results:
             (pos, token) = self.nexttoken()
-            if isinstance(token, (int, float, bool, str, bytes, PSLiteral)):
+            token_type = type(token)
+            if token_type is PSKeyword:
+                if token is KEYWORD_ARRAY_BEGIN:
+                    # begin array
+                    self.start_type(pos, "a")
+                elif token is KEYWORD_ARRAY_END:
+                    # end array
+                    try:
+                        self.push(self.end_type("a"))
+                    except PSTypeError:
+                        if settings.STRICT:
+                            raise
+                elif token is KEYWORD_DICT_BEGIN:
+                    # begin dictionary
+                    self.start_type(pos, "d")
+                elif token is KEYWORD_DICT_END:
+                    # end dictionary
+                    try:
+                        (pos, objs) = self.end_type("d")
+                        if len(objs) % 2 != 0:
+                            error_msg = f"Invalid dictionary construct: {objs!r}"
+                            raise PSSyntaxError(error_msg)
+                        d = {literal_name(k): v for (k, v) in choplist(2, objs) if v is not None}
+                        self.push((pos, d))
+                    except PSTypeError:
+                        if settings.STRICT:
+                            raise
+                elif token is KEYWORD_PROC_BEGIN:
+                    # begin proc
+                    self.start_type(pos, "p")
+                elif token is KEYWORD_PROC_END:
+                    # end proc
+                    try:
+                        self.push(self.end_type("p"))
+                    except PSTypeError:
+                        if settings.STRICT:
+                            raise
+                else:
+                    self.do_keyword(pos, cast(PSKeyword, token))
+            elif token_type in NORMAL_TOKEN_TYPES:
                 # normal token
-                self.push((pos, token))
-            elif token == KEYWORD_ARRAY_BEGIN:
-                # begin array
-                self.start_type(pos, "a")
-            elif token == KEYWORD_ARRAY_END:
-                # end array
-                try:
-                    self.push(self.end_type("a"))
-                except PSTypeError:
-                    if settings.STRICT:
-                        raise
-            elif token == KEYWORD_DICT_BEGIN:
-                # begin dictionary
-                self.start_type(pos, "d")
-            elif token == KEYWORD_DICT_END:
-                # end dictionary
-                try:
-                    (pos, objs) = self.end_type("d")
-                    if len(objs) % 2 != 0:
-                        error_msg = f"Invalid dictionary construct: {objs!r}"
-                        raise PSSyntaxError(error_msg)
-                    d = {
-                        literal_name(k): v
-                        for (k, v) in choplist(2, objs)
-                        if v is not None
-                    }
-                    self.push((pos, d))
-                except PSTypeError:
-                    if settings.STRICT:
-                        raise
-            elif token == KEYWORD_PROC_BEGIN:
-                # begin proc
-                self.start_type(pos, "p")
-            elif token == KEYWORD_PROC_END:
-                # end proc
-                try:
-                    self.push(self.end_type("p"))
-                except PSTypeError:
-                    if settings.STRICT:
-                        raise
-            elif isinstance(token, PSKeyword):
-                log.debug(
-                    "do_keyword: pos=%r, token=%r, stack=%r",
-                    pos,
-                    token,
-                    self.curstack,
-                )
-                self.do_keyword(pos, token)
+                self.curstack.append((pos, cast(PSStackType[ExtraT], token)))
             else:
                 log.error(
                     "unknown token: pos=%r, token=%r, stack=%r",
@@ -637,15 +684,11 @@ class PSStackParser(PSBaseParser, Generic[ExtraT]):
                     token,
                     self.curstack,
                 )
-                self.do_keyword(pos, token)
+                self.do_keyword(pos, cast(PSKeyword, token))
                 raise PSException
             if self.context:
                 continue
             else:
                 self.flush()
-        obj = self.results.pop(0)
-        try:
-            log.debug("nextobject: %r", obj)
-        except Exception:
-            log.debug("nextobject: (unprintable object)")
+        obj = self.results.popleft()
         return obj

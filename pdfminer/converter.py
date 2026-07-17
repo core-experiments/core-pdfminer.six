@@ -1,8 +1,8 @@
 import io
-import logging
 import re
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import (
+    TYPE_CHECKING,
     BinaryIO,
     ClassVar,
     Generic,
@@ -11,8 +11,6 @@ from typing import (
     cast,
 )
 
-from pdfminer import utils
-from pdfminer.image import ImageWriter
 from pdfminer.layout import (
     LAParams,
     LTAnno,
@@ -55,7 +53,8 @@ from pdfminer.utils import (
     mult_matrix,
 )
 
-log = logging.getLogger(__name__)
+if TYPE_CHECKING:
+    from pdfminer.image import ImageWriter
 
 
 class PDFLayoutAnalyzer(PDFTextDevice):
@@ -139,25 +138,18 @@ class PDFLayoutAnalyzer(PDFTextDevice):
             # And, per Section 4.4's Table 4.9, all other path commands place
             # their point-position in their final two arguments. (Any preceding
             # arguments represent control points on Bézier curves.)
-            raw_pts = [
-                cast(Point, p[-2:] if p[0] != "h" else path[0][-2:]) for p in path
-            ]
+            raw_pts = [cast(Point, p[-2:] if p[0] != "h" else path[0][-2:]) for p in path]
             pts = [apply_matrix_pt(self.ctm, pt) for pt in raw_pts]
 
             operators = [str(operation[0]) for operation in path]
             transformed_points = [
                 [
                     apply_matrix_pt(self.ctm, (float(operand1), float(operand2)))
-                    for operand1, operand2 in zip(
-                        operation[1::2], operation[2::2], strict=False
-                    )
+                    for operand1, operand2 in zip(operation[1::2], operation[2::2], strict=False)
                 ]
                 for operation in path
             ]
-            transformed_path = [
-                cast(PathSegment, (o, *p))
-                for o, p in zip(operators, transformed_points, strict=False)
-            ]
+            transformed_path = [cast(PathSegment, (o, *p)) for o, p in zip(operators, transformed_points, strict=False)]
 
             # Drop a redundant "l" on a path closed with "h"
             if len(shape) > 3 and shape[-2:] == "lh" and pts[-2] == pts[0]:
@@ -187,9 +179,9 @@ class PDFLayoutAnalyzer(PDFTextDevice):
                 (x0, y0), (x1, y1), (x2, y2), (x3, y3), _ = pts
 
                 is_closed_loop = pts[0] == pts[4]
-                has_square_coordinates = (
-                    x0 == x1 and y1 == y2 and x2 == x3 and y3 == y0
-                ) or (y0 == y1 and x1 == x2 and y2 == y3 and x3 == x0)
+                has_square_coordinates = (x0 == x1 and y1 == y2 and x2 == x3 and y3 == y0) or (
+                    y0 == y1 and x1 == x2 and y2 == y3 and x3 == x0
+                )
                 if is_closed_loop and has_square_coordinates:
                     rect = LTRect(
                         gstate.linewidth,
@@ -241,13 +233,17 @@ class PDFLayoutAnalyzer(PDFTextDevice):
         ncs: PDFColorSpace,
         graphicstate: PDFGraphicState,
     ) -> float:
-        try:
-            text = font.to_unichr(cid)
-            assert isinstance(text, str), str(type(text))
-        except PDFUnicodeNotDefined:
-            text = self.handle_undefined_char(font, cid)
+        font_cache = font._char_text_cache
+        text = font_cache.get(cid)
+        if text is None:
+            try:
+                text = font.to_unichr(cid)
+                assert isinstance(text, str), str(type(text))
+            except PDFUnicodeNotDefined:
+                text = self.handle_undefined_char(font, cid)
+            font_cache[cid] = text
         textwidth = font.char_width(cid)
-        textdisp = font.char_disp(cid)
+        textdisp = font.char_disp(cid) if font._vertical else 0
         item = LTChar(
             matrix,
             font,
@@ -264,7 +260,6 @@ class PDFLayoutAnalyzer(PDFTextDevice):
         return item.adv
 
     def handle_undefined_char(self, font: PDFFont, cid: int) -> str:
-        log.debug("undefined: %r, %r", font, cid)
         return f"(cid:{cid})"
 
     def receive_layout(self, ltpage: LTPage) -> None:
@@ -332,35 +327,47 @@ class TextConverter(PDFConverter[AnyIO]):
         pageno: int = 1,
         laparams: LAParams | None = None,
         showpageno: bool = False,
-        imagewriter: ImageWriter | None = None,
+        imagewriter: "ImageWriter | None" = None,
     ) -> None:
         super().__init__(rsrcmgr, outfp, codec=codec, pageno=pageno, laparams=laparams)
         self.showpageno = showpageno
         self.imagewriter = imagewriter
 
     def write_text(self, text: str) -> None:
-        text = utils.compatible_encode_method(text, self.codec, "ignore")
         if self.outfp_binary:
             cast(BinaryIO, self.outfp).write(text.encode())
         else:
             cast(TextIO, self.outfp).write(text)
 
     def receive_layout(self, ltpage: LTPage) -> None:
+        write_text: Callable[[str], int]
+        if self.outfp_binary:
+
+            def write_binary(text: str) -> int:
+                return cast(BinaryIO, self.outfp).write(text.encode())
+
+            write_text = write_binary
+
+        else:
+            write_text = cast(TextIO, self.outfp).write
+
         def render(item: LTItem) -> None:
-            if isinstance(item, LTContainer):
+            if isinstance(item, (LTChar, LTAnno)):
+                write_text(item.get_text())
+            elif isinstance(item, LTContainer):
                 for child in item:
                     render(child)
+                if isinstance(item, LTTextBox):
+                    write_text("\n")
             elif isinstance(item, LTText):
-                self.write_text(item.get_text())
-            if isinstance(item, LTTextBox):
-                self.write_text("\n")
+                write_text(item.get_text())
             elif isinstance(item, LTImage) and self.imagewriter is not None:
                 self.imagewriter.export_image(item)
 
         if self.showpageno:
-            self.write_text(f"Page {ltpage.pageid}\n")
+            write_text(f"Page {ltpage.pageid}\n")
         render(ltpage)
-        self.write_text("\f")
+        write_text("\f")
 
     # Some dummy functions to save memory/CPU when all that is wanted
     # is text.  This stops all the image and drawing output from being
@@ -407,7 +414,7 @@ class HTMLConverter(PDFConverter[AnyIO]):
         layoutmode: str = "normal",
         showpageno: bool = True,
         pagemargin: int = 50,
-        imagewriter: ImageWriter | None = None,
+        imagewriter: "ImageWriter | None" = None,
         debug: int = 0,
         rect_colors: dict[str, str] | None = None,
         text_colors: dict[str, str] | None = None,
@@ -457,10 +464,7 @@ class HTMLConverter(PDFConverter[AnyIO]):
     def write_header(self) -> None:
         self.write("<html><head>\n")
         if self.codec:
-            s = (
-                '<meta http-equiv="Content-Type" content="text/html; '
-                f'charset={self.codec}">\n'
-            )
+            s = f'<meta http-equiv="Content-Type" content="text/html; charset={self.codec}">\n'
         else:
             s = '<meta http-equiv="Content-Type" content="text/html">\n'
         self.write(s)
@@ -468,10 +472,7 @@ class HTMLConverter(PDFConverter[AnyIO]):
 
     def write_footer(self) -> None:
         page_links = [f'<a href="#{i}">{i}</a>' for i in range(1, self.pageno)]
-        s = (
-            '<div style="position:absolute; top:0px;">'
-            f"Page: {', '.join(page_links)}</div>\n"
-        )
+        s = f'<div style="position:absolute; top:0px;">Page: {", ".join(page_links)}</div>\n'
         self.write(s)
         self.write("</body></html>\n")
 
@@ -605,8 +606,7 @@ class HTMLConverter(PDFConverter[AnyIO]):
                 self.place_border("page", 1, item)
                 if self.showpageno:
                     self.write(
-                        '<div style="position:absolute; top:%dpx;">'
-                        f"{(self._yoffset - item.y1) * self.scale}",
+                        f'<div style="position:absolute; top:%dpx;">{(self._yoffset - item.y1) * self.scale}',
                     )
                     self.write(
                         f'<a name="{item.pageid}">Page {item.pageid}</a></div>\n',
@@ -691,7 +691,7 @@ class XMLConverter(PDFConverter[AnyIO]):
         codec: str = "utf-8",
         pageno: int = 1,
         laparams: LAParams | None = None,
-        imagewriter: ImageWriter | None = None,
+        imagewriter: "ImageWriter | None" = None,
         stripcontrol: bool = False,
     ) -> None:
         PDFConverter.__init__(
@@ -735,9 +735,7 @@ class XMLConverter(PDFConverter[AnyIO]):
     def receive_layout(self, ltpage: LTPage) -> None:
         def show_group(item: LTItem) -> None:
             if isinstance(item, LTTextBox):
-                self.write(
-                    f'<textbox id="{item.index}" bbox="{bbox2str(item.bbox)}" />\n'
-                )
+                self.write(f'<textbox id="{item.index}" bbox="{bbox2str(item.bbox)}" />\n')
             elif isinstance(item, LTTextGroup):
                 self.write(f'<textgroup bbox="{bbox2str(item.bbox)}">\n')
                 for child in item:
@@ -747,11 +745,7 @@ class XMLConverter(PDFConverter[AnyIO]):
         def render(item: LTItem) -> None:
             child: LTItem
             if isinstance(item, LTPage):
-                s = (
-                    f'<page id="{item.pageid}" '
-                    f'bbox="{bbox2str(item.bbox)}" '
-                    f'rotate="{item.rotate}">\n'
-                )
+                s = f'<page id="{item.pageid}" bbox="{bbox2str(item.bbox)}" rotate="{item.rotate}">\n'
                 self.write(s)
                 for child in item:
                     render(child)
@@ -762,26 +756,13 @@ class XMLConverter(PDFConverter[AnyIO]):
                     self.write("</layout>\n")
                 self.write("</page>\n")
             elif isinstance(item, LTLine):
-                s = (
-                    f"<line "
-                    f'linewidth="{item.linewidth}" '
-                    f'bbox="{bbox2str(item.bbox)}" />\n'
-                )
+                s = f'<line linewidth="{item.linewidth}" bbox="{bbox2str(item.bbox)}" />\n'
                 self.write(s)
             elif isinstance(item, LTRect):
-                s = (
-                    f"<rect "
-                    f'linewidth="{item.linewidth}" '
-                    f'bbox="{bbox2str(item.bbox)}" />\n'
-                )
+                s = f'<rect linewidth="{item.linewidth}" bbox="{bbox2str(item.bbox)}" />\n'
                 self.write(s)
             elif isinstance(item, LTCurve):
-                s = (
-                    f"<curve "
-                    f'linewidth="{item.linewidth}" '
-                    f'bbox="{bbox2str(item.bbox)}" '
-                    f'pts="{item.get_pts()}"/>\n'
-                )
+                s = f'<curve linewidth="{item.linewidth}" bbox="{bbox2str(item.bbox)}" pts="{item.get_pts()}"/>\n'
                 self.write(s)
             elif isinstance(item, LTFigure):
                 s = f'<figure name="{item.name}" bbox="{bbox2str(item.bbox)}">\n'
@@ -820,16 +801,9 @@ class XMLConverter(PDFConverter[AnyIO]):
             elif isinstance(item, LTImage):
                 if self.imagewriter is not None:
                     name = self.imagewriter.export_image(item)
-                    self.write(
-                        f"<image "
-                        f'src="{enc(name)}" '
-                        f'width="{item.width}" '
-                        f'height="{item.height}" />\n'
-                    )
+                    self.write(f'<image src="{enc(name)}" width="{item.width}" height="{item.height}" />\n')
                 else:
-                    self.write(
-                        f'<image width="{item.width}" height="{item.height}" />\n'
-                    )
+                    self.write(f'<image width="{item.width}" height="{item.height}" />\n')
             else:
                 raise AssertionError(str(("Unhandled", item)))
 
@@ -898,8 +872,7 @@ class HOCRConverter(PDFConverter[AnyIO]):
     def write_header(self) -> None:
         if self.codec:
             self.write(
-                "<html xmlns='http://www.w3.org/1999/xhtml' "
-                f"xml:lang='en' lang='en' charset='{self.codec}'>\n",
+                f"<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en' charset='{self.codec}'>\n",
             )
         else:
             self.write(
@@ -914,8 +887,7 @@ class HOCRConverter(PDFConverter[AnyIO]):
             "<meta name='ocr-system' content='pdfminer.six HOCR Converter' />\n",
         )
         self.write(
-            "  <meta name='ocr-capabilities'"
-            " content='ocr_page ocr_block ocr_line ocrx_word'/>\n",
+            "  <meta name='ocr-capabilities' content='ocr_page ocr_block ocr_line ocrx_word'/>\n",
         )
         self.write("</head>\n")
         self.write("<body>\n")
@@ -957,10 +929,7 @@ class HOCRConverter(PDFConverter[AnyIO]):
             if isinstance(item, LTPage):
                 self.page_bbox = item.bbox
                 self.write(
-                    f"<div "
-                    f"class='ocr_page' "
-                    f"id='{item.pageid}' "
-                    f"title='{self.bbox_repr(item.bbox)}'>\n",
+                    f"<div class='ocr_page' id='{item.pageid}' title='{self.bbox_repr(item.bbox)}'>\n",
                 )
                 for child in item:
                     render(child)
@@ -973,12 +942,7 @@ class HOCRConverter(PDFConverter[AnyIO]):
                     render(child_line)
                 self.write("</span>\n")
             elif isinstance(item, LTTextBox):
-                self.write(
-                    f"<div "
-                    f"class='ocr_block' "
-                    f"id='{item.index}' "
-                    f"title='{self.bbox_repr(item.bbox)}'>\n"
-                )
+                self.write(f"<div class='ocr_block' id='{item.index}' title='{self.bbox_repr(item.bbox)}'>\n")
                 for child in item:
                     render(child)
                 self.write("</div>\n")

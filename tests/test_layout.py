@@ -123,9 +123,7 @@ def test_pdf_with_empty_characters_horizontal():
     """
     path = absolute_sample_path("contrib/issue-449-horizontal.pdf")
     pages = extract_pages(path)
-    textboxes = [
-        textbox for textbox in next(pages) if isinstance(textbox, LTTextBoxHorizontal)
-    ]
+    textboxes = [textbox for textbox in next(pages) if isinstance(textbox, LTTextBoxHorizontal)]
     assert len(textboxes) == 3
 
 
@@ -141,7 +139,5 @@ def test_pdf_with_empty_characters_vertical():
     path = absolute_sample_path("contrib/issue-449-vertical.pdf")
     laparams = LAParams(detect_vertical=True)
     pages = extract_pages(path, laparams=laparams)
-    textboxes = [
-        textbox for textbox in next(pages) if isinstance(textbox, LTTextBoxVertical)
-    ]
+    textboxes = [textbox for textbox in next(pages) if isinstance(textbox, LTTextBoxVertical)]
     assert len(textboxes) == 3

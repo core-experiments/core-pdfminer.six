@@ -1,14 +1,20 @@
 import logging
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from io import BytesIO
-from typing import Union, cast
+from typing import Any, Union, cast
 
 from pdfminer import settings
-from pdfminer.casting import safe_cmyk, safe_float, safe_int, safe_matrix, safe_rgb
+from pdfminer.casting import (
+    safe_cmyk,
+    safe_float,
+    safe_int,
+    safe_matrix,
+    safe_rgb,
+)
 from pdfminer.cmapdb import CMap, CMapBase, CMapDB
 from pdfminer.pdfcolor import PREDEFINED_COLORSPACE, PDFColorSpace
-from pdfminer.pdfdevice import PDFDevice, PDFTextSeq
+from pdfminer.pdfdevice import PDFDevice
 from pdfminer.pdfexceptions import PDFException, PDFValueError
 from pdfminer.pdffont import (
     PDFCIDFont,
@@ -24,7 +30,6 @@ from pdfminer.pdftypes import (
     PDFObjRef,
     PDFStream,
     dict_value,
-    int_value,
     list_value,
     resolve1,
     stream_value,
@@ -129,9 +134,7 @@ StandardColor = Union[
 Color = Union[
     StandardColor,  # Standard colors (gray, RGB, CMYK)
     str,  # Pattern name (colored pattern, PaintType=1)
-    tuple[
-        StandardColor, str
-    ],  # (base_color, pattern_name) (uncolored pattern, PaintType=2)
+    tuple[StandardColor, str],  # (base_color, pattern_name) (uncolored pattern, PaintType=2)
 ]
 
 
@@ -214,7 +217,6 @@ class PDFResourceManager:
         if objid and objid in self._cached_fonts:
             font = self._cached_fonts[objid]
         else:
-            log.debug("get_font: create: objid=%r, spec=%r", objid, spec)
             if settings.STRICT and spec["Type"] is not LITERAL_FONT:
                 raise PDFFontError("Type is not /Font")
             # Create a Font object.
@@ -303,9 +305,7 @@ class PDFContentParser(PSStackParser[Union[PSKeyword, PDFStream]]):
                 c = bytes((ci,))
                 data += c
                 self.charpos += 1
-                if (len(target) <= i and c.isspace()) or (
-                    i < len(target) and c == (bytes((target[i],)))
-                ):
+                if (len(target) <= i and c.isspace()) or (i < len(target) and c == (bytes((target[i],)))):
                     i += 1
                 else:
                     i = 0
@@ -405,19 +405,15 @@ class PDFPageInterpreter:
             return
 
         def get_colorspace(spec: object) -> PDFColorSpace | None:
-            if isinstance(spec, list):
-                name = literal_name(spec[0])
-            else:
-                name = literal_name(spec)
+            name = literal_name(spec[0]) if isinstance(spec, list) else literal_name(spec)
             if name == "ICCBased" and isinstance(spec, list) and len(spec) >= 2:
-                return PDFColorSpace(name, int_value(stream_value(spec[1])["N"]))
+                return PDFColorSpace(name, stream_value(spec[1])["N"])
             elif name == "DeviceN" and isinstance(spec, list) and len(spec) >= 2:
                 return PDFColorSpace(name, len(list_value(spec[1])))
             else:
                 return PREDEFINED_COLORSPACE.get(name)
 
         for k, v in dict_value(resources).items():
-            log.debug("Resource: %r: %r", k, v)
             if k == "Font":
                 for fontid, spec in dict_value(v).items():
                     objid = None
@@ -547,8 +543,7 @@ class PDFPageInterpreter:
         if x_f is None or y_f is None:
             point = ("m", x, y)
             log.warning(
-                "Cannot start new subpath because not all values "
-                "in %r can be parsed as floats",
+                "Cannot start new subpath because not all values in %r can be parsed as floats",
                 point,
             )
         else:
@@ -562,8 +557,7 @@ class PDFPageInterpreter:
         if x_f is None or y_f is None:
             point = ("l", x, y)
             log.warning(
-                "Cannot append straight line segment to path "
-                "because not all values in %r can be parsed as floats",
+                "Cannot append straight line segment to path because not all values in %r can be parsed as floats",
                 point,
             )
         else:
@@ -586,18 +580,10 @@ class PDFPageInterpreter:
         y2_f = safe_float(y2)
         x3_f = safe_float(x3)
         y3_f = safe_float(y3)
-        if (
-            x1_f is None
-            or y1_f is None
-            or x2_f is None
-            or y2_f is None
-            or x3_f is None
-            or y3_f is None
-        ):
+        if x1_f is None or y1_f is None or x2_f is None or y2_f is None or x3_f is None or y3_f is None:
             point = ("c", x1, y1, x2, y2, x3, y3)
             log.warning(
-                "Cannot append curved segment to path "
-                "because not all values in %r can be parsed as floats",
+                "Cannot append curved segment to path because not all values in %r can be parsed as floats",
                 point,
             )
         else:
@@ -613,8 +599,7 @@ class PDFPageInterpreter:
         if x2_f is None or y2_f is None or x3_f is None or y3_f is None:
             point = ("v", x2, y2, x3, y3)
             log.warning(
-                "Cannot append curved segment to path "
-                "because not all values in %r can be parsed as floats",
+                "Cannot append curved segment to path because not all values in %r can be parsed as floats",
                 point,
             )
         else:
@@ -630,8 +615,7 @@ class PDFPageInterpreter:
         if x1_f is None or y1_f is None or x3_f is None or y3_f is None:
             point = ("y", x1, y1, x3, y3)
             log.warning(
-                "Cannot append curved segment to path "
-                "because not all values in %r can be parsed as floats",
+                "Cannot append curved segment to path because not all values in %r can be parsed as floats",
                 point,
             )
         else:
@@ -652,8 +636,7 @@ class PDFPageInterpreter:
         if x_f is None or y_f is None or w_f is None or h_f is None:
             values = (x, y, w, h)
             log.warning(
-                "Cannot append rectangle to path "
-                "because not all values in %r can be parsed as floats",
+                "Cannot append rectangle to path because not all values in %r can be parsed as floats",
                 values,
             )
         else:
@@ -767,8 +750,7 @@ class PDFPageInterpreter:
 
         if rgb is None:
             log.warning(
-                "Cannot set RGB stroke color "
-                "because not all values in %r can be parsed as floats",
+                "Cannot set RGB stroke color because not all values in %r can be parsed as floats",
                 (r, g, b),
             )
         else:
@@ -781,8 +763,7 @@ class PDFPageInterpreter:
 
         if rgb is None:
             log.warning(
-                "Cannot set RGB non-stroke color "
-                "because not all values in %r can be parsed as floats",
+                "Cannot set RGB non-stroke color because not all values in %r can be parsed as floats",
                 (r, g, b),
             )
         else:
@@ -795,8 +776,7 @@ class PDFPageInterpreter:
 
         if cmyk is None:
             log.warning(
-                "Cannot set CMYK stroke color "
-                "because not all values in %r can be parsed as floats",
+                "Cannot set CMYK stroke color because not all values in %r can be parsed as floats",
                 (c, m, y, k),
             )
         else:
@@ -809,17 +789,14 @@ class PDFPageInterpreter:
 
         if cmyk is None:
             log.warning(
-                "Cannot set CMYK non-stroke color "
-                "because not all values in %r can be parsed as floats",
+                "Cannot set CMYK non-stroke color because not all values in %r can be parsed as floats",
                 (c, m, y, k),
             )
         else:
             self.graphicstate.ncolor = cmyk
             self.graphicstate.ncs = self.csmap["DeviceCMYK"]
 
-    def _parse_color_components(
-        self, components: list[PDFStackT], context: str
-    ) -> StandardColor | None:
+    def _parse_color_components(self, components: list[PDFStackT], context: str) -> StandardColor | None:
         """Parse color components into StandardColor (gray, RGB, or CMYK).
 
         Args:
@@ -915,24 +892,18 @@ class PDFPageInterpreter:
             if len(components) == 1:
                 # Colored tiling pattern (PaintType=1): just pattern name
                 self.graphicstate.scolor = pattern_name
-                log.debug("Set stroke pattern (colored): %s", pattern_name)
             else:
                 # Uncolored tiling pattern (PaintType=2):
                 # color components + pattern name
                 base_color_components = components[:-1]
 
                 # Parse base color using shared logic
-                base_color = self._parse_color_components(
-                    base_color_components, "stroke (uncolored pattern)"
-                )
+                base_color = self._parse_color_components(base_color_components, "stroke (uncolored pattern)")
                 if base_color is None:
                     return
 
                 # Store as tuple: (base_color, pattern_name)
                 self.graphicstate.scolor = (base_color, pattern_name)
-                log.debug(
-                    "Set stroke pattern (uncolored): %s + %s", base_color, pattern_name
-                )
 
     def do_scn(self) -> None:
         """Set color for nonstroking operations.
@@ -981,26 +952,18 @@ class PDFPageInterpreter:
             if len(components) == 1:
                 # Colored tiling pattern (PaintType=1): just pattern name
                 self.graphicstate.ncolor = pattern_name
-                log.debug("Set non-stroke pattern (colored): %s", pattern_name)
             else:
                 # Uncolored tiling pattern (PaintType=2):
                 # color components + pattern name
                 base_color_components = components[:-1]
 
                 # Parse base color using shared logic
-                base_color = self._parse_color_components(
-                    base_color_components, "non-stroke (uncolored pattern)"
-                )
+                base_color = self._parse_color_components(base_color_components, "non-stroke (uncolored pattern)")
                 if base_color is None:
                     return
 
                 # Store as tuple: (base_color, pattern_name)
                 self.graphicstate.ncolor = (base_color, pattern_name)
-                log.debug(
-                    "Set non-stroke pattern (uncolored): %s + %s",
-                    base_color,
-                    pattern_name,
-                )
 
     def do_SC(self) -> None:
         """Set color for stroking operations"""
@@ -1047,8 +1010,7 @@ class PDFPageInterpreter:
             self.device.do_tag(tag, props)
         else:
             log.warning(
-                "Cannot define marked-content point with property list "
-                "because %r is not a PSLiteral",
+                "Cannot define marked-content point with property list because %r is not a PSLiteral",
                 tag,
             )
 
@@ -1068,8 +1030,7 @@ class PDFPageInterpreter:
             self.device.begin_tag(tag, props)
         else:
             log.warning(
-                "Cannot begin marked-content sequence with property list "
-                "because %r is not a PSLiteral",
+                "Cannot begin marked-content sequence with property list because %r is not a PSLiteral",
                 tag,
             )
 
@@ -1246,8 +1207,7 @@ class PDFPageInterpreter:
 
         if matrix is None:
             log.warning(
-                "Could not set text matrix because "
-                "not all values in %r can be parsed as floats",
+                "Could not set text matrix because not all values in %r can be parsed as floats",
                 values,
             )
         else:
@@ -1275,7 +1235,7 @@ class PDFPageInterpreter:
             return
         self.device.render_string(
             self.textstate,
-            cast(PDFTextSeq, seq),
+            seq,  # type: ignore[arg-type]
             self.graphicstate.ncs,
             self.graphicstate.copy(),
         )
@@ -1324,7 +1284,6 @@ class PDFPageInterpreter:
             if settings.STRICT:
                 raise PDFInterpreterError(f"Undefined xobject id: {xobjid!r}") from err
             return
-        log.debug("Processing xobj: %r", xobj)
         subtype = xobj.get("Subtype")
         if subtype is LITERAL_FORM and "BBox" in xobj:
             interpreter = self.subinterp()
@@ -1351,7 +1310,6 @@ class PDFPageInterpreter:
             pass
 
     def process_page(self, page: PDFPage) -> None:
-        log.debug("Processing page: %r", page)
         (x0, y0, x1, y1) = page.mediabox
         if page.rotate == 90:
             ctm = (0, -1, 1, 0, -y0, x1)
@@ -1375,12 +1333,6 @@ class PDFPageInterpreter:
 
         This method may be called recursively.
         """
-        log.debug(
-            "render_contents: resources=%r, streams=%r, ctm=%r",
-            resources,
-            streams,
-            ctm,
-        )
         self.init_resources(resources)
         self.init_state(ctm)
         self.execute(list_value(streams))
@@ -1398,9 +1350,7 @@ class PDFPageInterpreter:
             stream = stream_value(obj)
             if stream.objid is None:
                 # Inline streams without object IDs can't be tracked for circular refs
-                log.warning(
-                    "Execute called on non-indirect object (inline image?) %r", stream
-                )
+                log.warning("Execute called on non-indirect object (inline image?) %r", stream)
                 continue
             if stream.objid in self.parent_stream_ids:
                 log.warning(
@@ -1415,34 +1365,45 @@ class PDFPageInterpreter:
         except PSEOF:
             # empty page
             return
+        operator_cache: dict[
+            PSKeyword,
+            tuple[str, Callable[..., Any] | None, int],
+        ] = {}
+        nextobject = parser.nextobject
+        pop = self.pop
+        push = self.push
         while True:
             try:
-                (_, obj) = parser.nextobject()
+                (_, obj) = nextobject()
             except PSEOF:
                 break
-            if isinstance(obj, PSKeyword):
-                name = keyword_name(obj)
-                method = "do_{}".format(
-                    name.replace("*", "_a")
-                    .replace('"', "_w")
-                    .replace(
-                        "'",
-                        "_q",
+            if type(obj) is PSKeyword:
+                operator = operator_cache.get(obj)
+                if operator is None:
+                    name = keyword_name(obj)
+                    method = "do_{}".format(
+                        name.replace("*", "_a")
+                        .replace('"', "_w")
+                        .replace(
+                            "'",
+                            "_q",
+                        )
                     )
-                )
-                if hasattr(self, method):
-                    func = getattr(self, method)
-                    nargs = func.__code__.co_argcount - 1
+                    func = getattr(self, method, None)
+                    nargs = func.__code__.co_argcount - 1 if func is not None else 0
+                    operator = (name, func, nargs)
+                    operator_cache[obj] = operator
+                else:
+                    name, func, nargs = operator
+                if func is not None:
                     if nargs:
-                        args = self.pop(nargs)
-                        log.debug("exec: %s %r", name, args)
+                        args = pop(nargs)
                         if len(args) == nargs:
                             func(*args)
                     else:
-                        log.debug("exec: %s", name)
                         func()
                 elif settings.STRICT:
                     error_msg = f"Unknown operator: {name!r}"
                     raise PDFInterpreterError(error_msg)
             else:
-                self.push(obj)
+                push(cast(PDFStackT, obj))

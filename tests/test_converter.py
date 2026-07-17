@@ -213,17 +213,13 @@ class TestPaintPath:
         ]
 
         # "v" operator
-        assert parse([("m", 72.41, 433.89), ("v", 71.96, 434.89, 71.41, 434.89)])[
-            0
-        ].pts == [
+        assert parse([("m", 72.41, 433.89), ("v", 71.96, 434.89, 71.41, 434.89)])[0].pts == [
             (72.41, 433.89),
             (71.41, 434.89),
         ]
 
         # "y" operator
-        assert parse([("m", 72.41, 433.89), ("y", 72.41, 434.45, 71.41, 434.89)])[
-            0
-        ].pts == [
+        assert parse([("m", 72.41, 433.89), ("y", 72.41, 434.45, 71.41, 434.89)])[0].pts == [
             (72.41, 433.89),
             (71.41, 434.89),
         ]
@@ -335,10 +331,7 @@ class TestColorSpace:
                         if isinstance(item.stroking_color, str):
                             assert item.stroking_color.startswith("P")
                         # Uncolored pattern: stored as tuple (base_color, pattern_name)
-                        elif (
-                            isinstance(item.stroking_color, tuple)
-                            and len(item.stroking_color) == 2
-                        ):
+                        elif isinstance(item.stroking_color, tuple) and len(item.stroking_color) == 2:
                             _base_color, pattern_name = item.stroking_color
                             assert isinstance(pattern_name, str)
                             assert pattern_name.startswith("P")
@@ -347,10 +340,7 @@ class TestColorSpace:
                         if isinstance(item.non_stroking_color, str):
                             assert item.non_stroking_color.startswith("P")
                         # Uncolored pattern: stored as tuple (base_color, pattern_name)
-                        elif (
-                            isinstance(item.non_stroking_color, tuple)
-                            and len(item.non_stroking_color) == 2
-                        ):
+                        elif isinstance(item.non_stroking_color, tuple) and len(item.non_stroking_color) == 2:
                             _base_color, pattern_name = item.non_stroking_color
                             assert isinstance(pattern_name, str)
                             assert pattern_name.startswith("P")

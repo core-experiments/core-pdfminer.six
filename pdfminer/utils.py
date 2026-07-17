@@ -21,10 +21,6 @@ from pdfminer.pdfexceptions import PDFTypeError, PDFValueError
 if TYPE_CHECKING:
     from pdfminer.layout import LTComponent
 
-import contextlib
-
-import charset_normalizer  # For str encoding detection
-
 # from sys import maxint as INF doesn't work anymore under Python3, but PDF
 # still uses 32 bits ints
 INF = (1 << 31) - 1
@@ -68,6 +64,8 @@ def make_compat_bytes(in_str: str) -> bytes:
 def make_compat_str(o: object) -> str:
     """Converts everything to string, if bytes guessing the encoding."""
     if isinstance(o, bytes):
+        import charset_normalizer
+
         enc = charset_normalizer.detect(o)
         if enc["encoding"] is None:
             return str(o)
@@ -122,9 +120,7 @@ def paeth_predictor(left: int, above: int, upper_left: int) -> int:
         return upper_left
 
 
-def apply_tiff_predictor(
-    colors: int, columns: int, bitspercomponent: int, data: bytes
-) -> bytes:
+def apply_tiff_predictor(colors: int, columns: int, bitspercomponent: int, data: bytes) -> bytes:
     """Reverse the effect of the TIFF predictor 2
 
     Documentation:
@@ -167,16 +163,16 @@ def apply_png_predictor(
 
     nbytes = colors * columns * bitspercomponent // 8
     bpp = colors * bitspercomponent // 8  # number of bytes per complete pixel
-    buf = bytearray()
-    line_above = bytearray(columns)
+    buf = []
+    line_above = list(b"\x00" * columns)
     for scanline_i in range(0, len(data), nbytes + 1):
         filter_type = data[scanline_i]
         line_encoded = data[scanline_i + 1 : scanline_i + 1 + nbytes]
-        raw = bytearray()
+        raw = []
 
         if filter_type == 0:
             # Filter type 0: None
-            raw = bytearray(line_encoded)
+            raw = list(line_encoded)
 
         elif filter_type == 1:
             # Filter type 1: Sub
@@ -186,7 +182,7 @@ def apply_png_predictor(
             # (computed mod 256), where Raw() refers to the bytes already
             #  decoded.
             for j, sub_x in enumerate(line_encoded):
-                raw_x_bpp = 0 if j < bpp else raw[j - bpp]
+                raw_x_bpp = 0 if j - bpp < 0 else int(raw[j - bpp])
                 raw_x = (sub_x + raw_x_bpp) & 255
                 raw.append(raw_x)
 
@@ -211,8 +207,8 @@ def apply_png_predictor(
             # bytes already decoded, and Prior() refers to the decoded bytes of
             # the prior scanline.
             for j, average_x in enumerate(line_encoded):
-                raw_x_bpp = 0 if j < bpp else raw[j - bpp]
-                prior_x = line_above[j]
+                raw_x_bpp = 0 if j - bpp < 0 else int(raw[j - bpp])
+                prior_x = int(line_above[j])
                 raw_x = (average_x + (raw_x_bpp + prior_x) // 2) & 255
                 raw.append(raw_x)
 
@@ -226,13 +222,13 @@ def apply_png_predictor(
             # already decoded. Exactly the same PaethPredictor() function is
             # used by both encoder and decoder.
             for j, paeth_x in enumerate(line_encoded):
-                if j < bpp:
+                if j - bpp < 0:
                     raw_x_bpp = 0
                     prior_x_bpp = 0
                 else:
-                    raw_x_bpp = raw[j - bpp]
-                    prior_x_bpp = line_above[j - bpp]
-                prior_x = line_above[j]
+                    raw_x_bpp = int(raw[j - bpp])
+                    prior_x_bpp = int(line_above[j - bpp])
+                prior_x = int(line_above[j])
                 paeth = paeth_predictor(raw_x_bpp, prior_x, prior_x_bpp)
                 raw_x = (paeth_x + paeth) & 255
                 raw.append(raw_x)
@@ -310,16 +306,16 @@ def apply_matrix_rect(m: Matrix, rect: Rect) -> Rect:
     :returns a rectangle with the same orientation, but that would fit the rotated
         content.
     """
+    (a, b, c, d, e, f) = m
     (x0, y0, x1, y1) = rect
-    left_bottom = (x0, y0)
-    right_bottom = (x1, y0)
-    right_top = (x1, y1)
-    left_top = (x0, y1)
-
-    (left1, bottom1) = apply_matrix_pt(m, left_bottom)
-    (right1, bottom2) = apply_matrix_pt(m, right_bottom)
-    (right2, top1) = apply_matrix_pt(m, right_top)
-    (left2, top2) = apply_matrix_pt(m, left_top)
+    left1 = a * x0 + c * y0 + e
+    bottom1 = b * x0 + d * y0 + f
+    right1 = a * x1 + c * y0 + e
+    bottom2 = b * x1 + d * y0 + f
+    right2 = a * x1 + c * y1 + e
+    top1 = b * x1 + d * y1 + f
+    left2 = a * x0 + c * y1 + e
+    top2 = b * x0 + d * y1 + f
 
     return (
         min(left1, left2, right1, right2),
@@ -746,7 +742,7 @@ class Plane(Generic[LTComponentT]):
     def __init__(self, bbox: Rect, gridsize: int = 50) -> None:
         self._seq: list[LTComponentT] = []  # preserve the object order.
         self._objs: set[LTComponentT] = set()
-        self._grid: dict[Point, list[LTComponentT]] = {}
+        self._grid: dict[Point, dict[LTComponentT, int]] = {}
         self.gridsize = gridsize
         (self.x0, self.y0, self.x1, self.y1) = bbox
 
@@ -770,8 +766,13 @@ class Plane(Generic[LTComponentT]):
         y0 = max(self.y0, y0)
         x1 = min(self.x1, x1)
         y1 = min(self.y1, y1)
-        for grid_y in drange(y0, y1, self.gridsize):
-            for grid_x in drange(x0, x1, self.gridsize):
+        gridsize = self.gridsize
+        grid_x0 = int(x0) // gridsize
+        grid_x1 = int(x1 + gridsize) // gridsize
+        grid_y0 = int(y0) // gridsize
+        grid_y1 = int(y1 + gridsize) // gridsize
+        for grid_y in range(grid_y0, grid_y1):
+            for grid_x in range(grid_x0, grid_x1):
                 yield (grid_x, grid_y)
 
     def extend(self, objs: Iterable[LTComponentT]) -> None:
@@ -780,37 +781,41 @@ class Plane(Generic[LTComponentT]):
 
     def add(self, obj: LTComponentT) -> None:
         """Place an object."""
+        grid = self._grid
         for k in self._getrange((obj.x0, obj.y0, obj.x1, obj.y1)):
-            if k not in self._grid:
-                r: list[LTComponentT] = []
-                self._grid[k] = r
-            else:
-                r = self._grid[k]
-            r.append(obj)
+            bucket = grid.get(k)
+            if bucket is None:
+                bucket = {}
+                grid[k] = bucket
+            bucket[obj] = bucket.get(obj, 0) + 1
         self._seq.append(obj)
         self._objs.add(obj)
 
     def remove(self, obj: LTComponentT) -> None:
         """Displace an object."""
         for k in self._getrange((obj.x0, obj.y0, obj.x1, obj.y1)):
-            with contextlib.suppress(KeyError, ValueError):
-                self._grid[k].remove(obj)
+            bucket = self._grid.get(k)
+            if bucket is not None:
+                count = bucket.get(obj)
+                if count == 1:
+                    del bucket[obj]
+                elif count is not None:
+                    bucket[obj] = count - 1
         self._objs.remove(obj)
 
     def find(self, bbox: Rect) -> Iterator[LTComponentT]:
         """Finds objects that are in a certain area."""
         (x0, y0, x1, y1) = bbox
-        done = set()
+        grid = self._grid
+        candidates: dict[LTComponentT, int] = {}
         for k in self._getrange(bbox):
-            if k not in self._grid:
+            bucket = grid.get(k)
+            if bucket is not None:
+                candidates.update(bucket)
+        for obj in candidates:
+            if obj.x1 <= x0 or x1 <= obj.x0 or obj.y1 <= y0 or y1 <= obj.y0:
                 continue
-            for obj in self._grid[k]:
-                if obj in done:
-                    continue
-                done.add(obj)
-                if obj.x1 <= x0 or x1 <= obj.x0 or obj.y1 <= y0 or y1 <= obj.y0:
-                    continue
-                yield obj
+            yield obj
 
 
 ROMAN_ONES = ["i", "x", "c", "m"]

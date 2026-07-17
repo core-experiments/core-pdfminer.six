@@ -42,9 +42,7 @@ class MockPdfFont(PDFFont):
         ("Invalid cid widths should use default", {"0": None}, 0.1),
     ],
 )
-def test_pdffont_char_width_defaults(
-    msg: str, widths: dict[str | int, float], expected: float
-) -> None:
+def test_pdffont_char_width_defaults(msg: str, widths: dict[str | int, float], expected: float) -> None:
     pdffont = MockPdfFont(descriptor={}, widths=widths, default_width=100.0)
 
     assert pdffont.char_width(0) == expected, msg
@@ -78,14 +76,10 @@ def test_cmap_font_12():
             yield from PDFPage.get_pages(fp)
 
     pdf_rm = PDFResourceManager()
-    pdf_param = LAParams(
-        detect_vertical=True, char_margin=1, all_texts=True, boxes_flow=None
-    )
+    pdf_param = LAParams(detect_vertical=True, char_margin=1, all_texts=True, boxes_flow=None)
     pdf_device = PDFPageAggregator(pdf_rm, laparams=pdf_param)
     pdf_interpreter = PDFPageInterpreter(pdf_rm, pdf_device)
-    for pdf_page in pdf_to_pages(
-        absolute_sample_path("contrib/issue-598-cmap-other-fonts.pdf")
-    ):
+    for pdf_page in pdf_to_pages(absolute_sample_path("contrib/issue-598-cmap-other-fonts.pdf")):
         pdf_interpreter.process_page(pdf_page)
 
     assert pdf_device.get_result() is not None

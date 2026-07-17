@@ -81,8 +81,7 @@ class PDFObjRef(PDFObject):
         """
         if _ is not _DEFAULT:
             warn(
-                "The third argument of PDFObjRef is unused and will be removed after "
-                "2024",
+                "The third argument of PDFObjRef is unused and will be removed after 2024",
                 DeprecationWarning,
                 stacklevel=2,
             )
@@ -262,9 +261,7 @@ class PDFStream(PDFObject):
     def __repr__(self) -> str:
         if self.data is None:
             assert self.rawdata is not None
-            return (
-                f"<PDFStream({self.objid!r}): raw={len(self.rawdata)}, {self.attrs!r}>"
-            )
+            return f"<PDFStream({self.objid!r}): raw={len(self.rawdata)}, {self.attrs!r}>"
         else:
             assert self.data is not None
             return f"<PDFStream({self.objid!r}): len={len(self.data)}, {self.attrs!r}>"
@@ -276,9 +273,7 @@ class PDFStream(PDFObject):
         try:
             return self.attrs[name]
         except KeyError as e:
-            raise PDFKeyError(
-                f"PDF stream object {self.objid} does not have attribute '{name}'"
-            ) from e
+            raise PDFKeyError(f"PDF stream object {self.objid} does not have attribute '{name}'") from e
 
     def get(self, name: str, default: object = None) -> Any:
         return self.attrs.get(name, default)

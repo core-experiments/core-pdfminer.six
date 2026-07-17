@@ -13,7 +13,6 @@ from pdfminer.converter import (
     TextConverter,
     XMLConverter,
 )
-from pdfminer.image import ImageWriter
 from pdfminer.layout import LAParams, LTPage
 from pdfminer.pdfdevice import PDFDevice, TagExtractor
 from pdfminer.pdfexceptions import PDFValueError
@@ -74,6 +73,8 @@ def extract_text_to_fp(
 
     imagewriter = None
     if output_dir:
+        from pdfminer.image import ImageWriter
+
         imagewriter = ImageWriter(output_dir)
 
     rsrcmgr = PDFResourceManager(caching=not disable_caching)

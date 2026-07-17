@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 
 
 PDFTextSeq = Iterable[int | float | bytes]
+PDF_TEXT_NUMBER_TYPES = frozenset((int, float, bool))
 
 logger = logging.getLogger(__name__)
 
@@ -162,17 +163,20 @@ class PDFTextDevice(PDFDevice):
         graphicstate: "PDFGraphicState",
     ) -> Point:
         (x, y) = pos
+        (a, b, c, d, e, f) = matrix
+        decode = font.decode
+        render_char = self.render_char
         needcharspace = False
         for obj in seq:
-            if isinstance(obj, (int, float)):
-                x -= obj * dxscale
+            if type(obj) in PDF_TEXT_NUMBER_TYPES:
+                x -= cast(float, obj) * dxscale
                 needcharspace = True
-            elif isinstance(obj, bytes):
-                for cid in font.decode(obj):
+            elif type(obj) is bytes:
+                for cid in decode(obj):
                     if needcharspace:
                         x += charspace
-                    x += self.render_char(
-                        utils.translate_matrix(matrix, (x, y)),
+                    x += render_char(
+                        (a, b, c, d, x * a + y * c + e, x * b + y * d + f),
                         font,
                         fontsize,
                         scaling,
@@ -186,8 +190,7 @@ class PDFTextDevice(PDFDevice):
                     needcharspace = True
             else:
                 logger.warning(
-                    "Cannot render horizontal string because "
-                    "%r is not a valid int, float or bytes.",
+                    "Cannot render horizontal string because %r is not a valid int, float or bytes.",
                     obj,
                 )
         return (x, y)
@@ -208,17 +211,20 @@ class PDFTextDevice(PDFDevice):
         graphicstate: "PDFGraphicState",
     ) -> Point:
         (x, y) = pos
+        (a, b, c, d, e, f) = matrix
+        decode = font.decode
+        render_char = self.render_char
         needcharspace = False
         for obj in seq:
-            if isinstance(obj, (int, float)):
-                y -= obj * dxscale
+            if type(obj) in PDF_TEXT_NUMBER_TYPES:
+                y -= cast(float, obj) * dxscale
                 needcharspace = True
-            elif isinstance(obj, bytes):
-                for cid in font.decode(obj):
+            elif type(obj) is bytes:
+                for cid in decode(obj):
                     if needcharspace:
                         y += charspace
-                    y += self.render_char(
-                        utils.translate_matrix(matrix, (x, y)),
+                    y += render_char(
+                        (a, b, c, d, x * a + y * c + e, x * b + y * d + f),
                         font,
                         fontsize,
                         scaling,
@@ -232,8 +238,7 @@ class PDFTextDevice(PDFDevice):
                     needcharspace = True
             else:
                 logger.warning(
-                    "Cannot render vertical string because %r is not a valid "
-                    "int, float or bytes.",
+                    "Cannot render vertical string because %r is not a valid int, float or bytes.",
                     obj,
                 )
         return (x, y)
@@ -290,10 +295,7 @@ class TagExtractor(PDFDevice):
         self._write(utils.enc(text))
 
     def begin_page(self, page: PDFPage, ctm: Matrix) -> None:
-        output = (
-            f'<page id="{self.pageno}" bbox="{utils.bbox2str(page.mediabox)}" '
-            f'rotate="{page.rotate}">'
-        )
+        output = f'<page id="{self.pageno}" bbox="{utils.bbox2str(page.mediabox)}" rotate="{page.rotate}">'
         self._write(output)
 
     def end_page(self, page: PDFPage) -> None:
@@ -304,10 +306,7 @@ class TagExtractor(PDFDevice):
         s = ""
         if isinstance(props, dict):
             s = "".join(
-                [
-                    f' {utils.enc(k)}="{utils.make_compat_str(v)}"'
-                    for (k, v) in sorted(props.items())
-                ],
+                [f' {utils.enc(k)}="{utils.make_compat_str(v)}"' for (k, v) in sorted(props.items())],
             )
         out_s = f"<{utils.enc(cast(str, tag.name))}{s}>"
         self._write(out_s)
