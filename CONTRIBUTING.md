@@ -27,7 +27,7 @@ Any contribution is appreciated! You might want to:
 ## Guideline for creating pull request
 
 * A pull request should close an existing issue. For example, use "Fix #123" to indicate that your PR fixes issue 123.
-* Pull requests should be merged to master.
+* Pull requests should be merged to main.
 * Include unit tests when possible. In case of bugs, this will help to prevent the same mistake in the future. In case
   of features, this will show that your code works correctly.
 * Code should work for Python 3.10+.

@@ -1,14 +1,14 @@
 name: Continuous integration
 
 on:
-  push: # run when commits are added to master
+  push: # run when commits are added to main
     branches:
-      - master
+      - main
     tags:
       - '[0-9]+'  # match version tags with only numbers
-  pull_request: # run on pr's against master
+  pull_request: # run on pr's against main
     branches:
-      - master
+      - main
   merge_group:
     types:
       - checks_requested
