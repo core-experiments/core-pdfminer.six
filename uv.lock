@@ -299,6 +299,7 @@ wheels = [
 
 [[package]]
 name = "core-pdfminer-six"
+version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "charset-normalizer" },

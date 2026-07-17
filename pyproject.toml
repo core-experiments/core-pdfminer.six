@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools >= 61.0", "setuptools-scm>=8"]
+requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "core-pdfminer.six"
-dynamic = ["version"]
+version = "0.0.0"
 description = "PDF parser and analyzer"
 readme = "README.md"
 license = "MIT"
@@ -77,8 +77,6 @@ script-files = [
 
 [tool.setuptools.package-data]
 core_pdfminer_six = ["py.typed", "cmap/*.json.gz", "cmap/*.txt"]
-
-[tool.setuptools_scm]
 
 [tool.ruff]
 target-version = "py310"
