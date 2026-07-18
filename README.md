@@ -3,7 +3,7 @@ core-pdfminer.six
 
 [![Continuous integration](https://github.com/core-experiments/core-pdfminer.six/actions/workflows/actions.yml/badge.svg)](https://github.com/core-experiments/core-pdfminer.six/actions/workflows/actions.yml)
 
-*We fathom PDF*
+We fathom PDF
 
 Core-pdfminer.six is a performance-focused fork of pdfminer.six. It extracts information from PDF documents, with a
 focus on text data, while retaining the familiar pdfminer.six API design under the `core_pdfminer_six` namespace.
@@ -13,7 +13,6 @@ uses beyond text analysis.
 
 Check out the full documentation on
 [Read the Docs](https://pdfminersix.readthedocs.io).
-
 
 Features
 --------
@@ -38,6 +37,7 @@ How to use
 
 * Install Python 3.10 or newer.
 * Install core-pdfminer.six.
+
   ```bash
   pip install core-pdfminer.six
 
@@ -52,6 +52,7 @@ How to use
   pdf2txt.py example.pdf
 
 * Or use it with Python.
+
   ```python
   from core_pdfminer_six.high_level import extract_text
 
@@ -67,7 +68,8 @@ We welcome contributions! Whether you want to fix a bug, add a feature, or impro
 Please note that as a community-maintained project with limited maintainer availability, the best way to get an issue resolved is to submit a pull request yourself.
 
 To get started:
-1. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and coding standards
+
+1. Read [CONTRIBUTING.md](docs/repo/CONTRIBUTING.md) for setup instructions and coding standards
 2. Check out the [open issues](https://github.com/core-experiments/core-pdfminer.six/issues) to find something to work on
 
 Acknowledgement

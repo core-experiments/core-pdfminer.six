@@ -83,4 +83,4 @@ Contributing
 
 We welcome any contributors to core-pdfminer.six! But, before doing anything, take
 a look at the `contribution guide
-<https://github.com/core-experiments/core-pdfminer.six/blob/main/CONTRIBUTING.md>`_.
+<https://github.com/core-experiments/core-pdfminer.six/blob/main/docs/repo/CONTRIBUTING.md>`_.

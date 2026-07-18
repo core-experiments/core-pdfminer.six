@@ -159,20 +159,20 @@ class TestDumpImages:
         Regression test for:
         https://github.com/pdfminer/pdfminer.six/issues/131
         """
-        filepath = absolute_sample_path("../samples/nonfree/dmca.pdf")
+        filepath = absolute_sample_path("nonfree/dmca.pdf")
         image_files = self.extract_images(filepath, "-p", "1")
         assert image_files[0].endswith("bmp")
 
     def test_nonfree_175(self):
         """Extract images of pdf containing jpg images"""
-        self.extract_images(absolute_sample_path("../samples/nonfree/175.pdf"))
+        self.extract_images(absolute_sample_path("nonfree/175.pdf"))
 
     def test_jbig2_image_export(self):
         """Extract images of pdf containing jbig2 images
 
         Feature test for: https://github.com/pdfminer/pdfminer.six/pull/46
         """
-        input_file = absolute_sample_path("../samples/contrib/pdf-with-jbig2.pdf")
+        input_file = absolute_sample_path("contrib/pdf-with-jbig2.pdf")
         output_dir = mkdtemp()
         with TemporaryFilePath() as output_file_name:
             commands = ["-o", output_file_name, "--output-dir", output_dir, input_file]
@@ -182,7 +182,7 @@ class TestDumpImages:
             assert image_files[0].endswith(".jb2")
             assert filecmp.cmp(
                 output_dir + "/" + image_files[0],
-                absolute_sample_path("../samples/contrib/XIPLAYER0.jb2"),
+                absolute_sample_path("contrib/XIPLAYER0.jb2"),
             )
         finally:
             rmtree(output_dir)

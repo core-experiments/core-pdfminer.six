@@ -6,7 +6,7 @@ How to extract font names and sizes from PDF's
 Before you start, make sure you have :ref:`installed core-pdfminer.six<install>`.
 
 The following code sample shows how to extract font names and sizes for each of the characters. This uses the
-[simple1.pdf](https://raw.githubusercontent.com/core-experiments/core-pdfminer.six/main/samples/simple1.pdf).
+[simple1.pdf](https://raw.githubusercontent.com/core-experiments/core-pdfminer.six/main/tests/fixtures/samples/simple1.pdf).
 
 .. code-block:: python
 
@@ -59,7 +59,7 @@ The following code sample shows how to extract font names and sizes for each of 
         return ''
 
 
-    path = Path('samples/simple1.pdf').expanduser()
+    path = Path('tests/fixtures/samples/simple1.pdf').expanduser()
     pages = extract_pages(path)
     show_ltitem_hierarchy(pages)
 
