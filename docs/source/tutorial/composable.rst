@@ -20,7 +20,7 @@ variable::
     from core_pdfminer_six.pdfparser import PDFParser
 
     output_string = StringIO()
-    with open('samples/simple1.pdf', 'rb') as in_file:
+    with open('tests/fixtures/samples/simple1.pdf', 'rb') as in_file:
         parser = PDFParser(in_file)
         doc = PDFDocument(parser)
         rsrcmgr = PDFResourceManager()

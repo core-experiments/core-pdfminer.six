@@ -24,7 +24,7 @@ class TestPaintPath:
         assert len(analyzer.cur_item) == 1
 
     def test_paint_path_multiple_mlllh(self):
-        """Path from samples/contrib/issue-00369-excel.pdf"""
+        """Path from tests/fixtures/samples/contrib/issue-00369-excel.pdf"""
         path = [
             ("m", 6, 7),
             ("l", 7, 7),
@@ -183,7 +183,7 @@ class TestPaintPath:
 
         # There are six lines in this one-page PDF;
         # they all have shape 'ml' not 'mlh'
-        ml_pdf = extract_pages("samples/contrib/pr-00530-ml-lines.pdf")
+        ml_pdf = extract_pages(absolute_sample_path("contrib/pr-00530-ml-lines.pdf"))
         ml_pdf_page = next(iter(ml_pdf))
         assert sum(type(item) is LTLine for item in ml_pdf_page) == 6
 
@@ -273,7 +273,7 @@ class TestPaintPath:
         assert len(analyzer.cur_item._objs) == 0
 
     def test_linewidth(self):
-        ml_pdf = extract_pages("samples/contrib/issue_1165_linewidth.pdf")
+        ml_pdf = extract_pages(absolute_sample_path("contrib/issue_1165_linewidth.pdf"))
         ml_pdf_page = next(iter(ml_pdf))
         lines = sorted(
             [item for item in ml_pdf_page if type(item) is LTLine],
